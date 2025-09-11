@@ -33,9 +33,14 @@
 - ✅ Tests CRUD operations with proper authorization
 
 ### 4. RoleAndPermissionSeeder.php ✅
-- ✅ All CRUD permissions created for users model (view, create, edit, delete, view own, edit own, delete own)
-- ✅ Manager role with specific permissions (view users, edit users, view dashboard)
-- ✅ User role with own permissions (view own users, edit own users, view dashboard)
+- ✅ **ENHANCED**: Comprehensive permission scheme implemented
+  - Basic CRUD: view, create, edit, delete
+  - Own permissions: view own, edit own, delete own
+  - Advanced: approve, publish, archive, restore, export, import
+  - Management: manage, assign
+  - Global: view dashboard, manage settings, access reports, view analytics, manage system, access admin panel, view logs, manage backups
+- ✅ Manager role with enhanced permissions (user management, role management, reports access)
+- ✅ User role with own permissions and basic access
 - ✅ Admin role has all permissions
 
 ### 5. RoleMenuSeeder.php ✅
@@ -46,10 +51,11 @@
 - ✅ Menu items match assigned permissions
 
 ### 6. Test Integration ✅
-- ✅ All 54 tests pass
+- ✅ All 55 tests pass (including new permission scheme)
 - ✅ Frontend menu visibility works correctly based on permissions
 - ✅ Button visibility tested through permission checks
 - ✅ Own permission restrictions properly enforced
+- ✅ New permission scheme tested and working
 
 ## Acceptance Criteria ✅
 - ✅ Admin sees all menus and buttons

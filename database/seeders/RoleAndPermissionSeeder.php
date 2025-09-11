@@ -29,42 +29,80 @@ class RoleAndPermissionSeeder extends Seeder
             $this->createPermissionsForModel($model);
         }
 
-        // Create additional permissions that don't belong to specific models
-        Permission::firstOrCreate(['name' => 'view dashboard']);
+        // Create global permissions that don't belong to specific models
+        $globalPermissions = [
+            'view dashboard',
+            'manage settings',
+            'access reports',
+            'view analytics',
+            'manage system',
+            'access admin panel',
+            'view logs',
+            'manage backups',
+        ];
 
-        // create roles and assign created permissions
+        foreach ($globalPermissions as $permission) {
+            Permission::firstOrCreate(['name' => $permission]);
+        }
+
+        // Create roles and assign permissions
         $adminRole = Role::firstOrCreate(['name' => 'admin']);
         $adminRole->givePermissionTo(Permission::all());
 
         $managerRole = Role::firstOrCreate(['name' => 'manager']);
         $managerRole->givePermissionTo([
+            // User management
             'view users',
+            'create users',
             'edit users',
+            'export users',
+            'import users',
+
+            // Role management
             'view roles',
-            'view dashboard'
+            'manage roles',
+
+            // Global permissions
+            'view dashboard',
+            'access reports',
+            'view analytics',
+            'access admin panel',
         ]);
 
         $userRole = Role::firstOrCreate(['name' => 'user']);
         $userRole->givePermissionTo([
-            'view own users',
-            'edit own users',
-            'view dashboard'
+            // Basic user management
+            'view users',
+            'edit users',
+
+            // Basic access
+            'view dashboard',
         ]);
     }
 
     /**
-     * Membuat permission CRUD untuk model tertentu
+     * Membuat permission yang lebih komprehensif untuk model tertentu
      */
     private function createPermissionsForModel(string $model): void
     {
         $permissions = [
+            // Basic CRUD permissions
             "view {$model}",
             "create {$model}",
             "edit {$model}",
             "delete {$model}",
-            "view own {$model}",
-            "edit own {$model}",
-            "delete own {$model}",
+
+            // Advanced permissions
+            "approve {$model}",
+            "publish {$model}",
+            "archive {$model}",
+            "restore {$model}",
+            "export {$model}",
+            "import {$model}",
+
+            // Management permissions
+            "manage {$model}",
+            "assign {$model}",
         ];
 
         foreach ($permissions as $permission) {

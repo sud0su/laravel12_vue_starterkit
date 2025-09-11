@@ -18,17 +18,11 @@ class UserController extends Controller
         $user = auth()->user();
         $userPermissions = $user->getAllPermissions()->pluck('name')->toArray();
 
-        $query = User::with('roles');
-
-        // If user has only own permissions, filter users to only their own
-        $hasViewUsers = in_array('view users', $userPermissions);
-        $hasViewOwnUsers = in_array('view own users', $userPermissions);
-
-        if (!$hasViewUsers && $hasViewOwnUsers) {
-            $query->where('id', $user->id);
+        if (!in_array('view users', $userPermissions)) {
+            abort(403, 'Unauthorized');
         }
 
-        $users = $query->paginate(10);
+        $users = User::with('roles')->paginate(10);
 
         return Inertia::render('Users/Index', [
             'users' => $users,

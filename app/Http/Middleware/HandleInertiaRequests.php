@@ -61,11 +61,7 @@ class HandleInertiaRequests extends Middleware
                     $model = str_replace('/', '', $menu->href);
 
                     // Check if user has view permission for this model
-                    $hasViewPermission = in_array("view {$model}", $userPermissions);
-                    $hasViewOwnPermission = in_array("view own {$model}", $userPermissions);
-
-                    // Show menu if user has view or view own permission
-                    return $hasViewPermission || $hasViewOwnPermission;
+                    return in_array("view {$model}", $userPermissions);
                 })
                 ->map(function ($menu) {
                     return [
