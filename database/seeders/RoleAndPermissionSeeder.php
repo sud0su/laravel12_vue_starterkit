@@ -29,11 +29,27 @@ class RoleAndPermissionSeeder extends Seeder
             $this->createPermissionsForModel($model);
         }
 
+        // Create additional permissions that don't belong to specific models
+        Permission::firstOrCreate(['name' => 'view dashboard']);
+
         // create roles and assign created permissions
         $adminRole = Role::firstOrCreate(['name' => 'admin']);
         $adminRole->givePermissionTo(Permission::all());
 
+        $managerRole = Role::firstOrCreate(['name' => 'manager']);
+        $managerRole->givePermissionTo([
+            'view users',
+            'edit users',
+            'view roles',
+            'view dashboard'
+        ]);
+
         $userRole = Role::firstOrCreate(['name' => 'user']);
+        $userRole->givePermissionTo([
+            'view own users',
+            'edit own users',
+            'view dashboard'
+        ]);
     }
 
     /**

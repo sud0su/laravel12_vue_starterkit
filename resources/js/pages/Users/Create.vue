@@ -16,6 +16,9 @@ const props = defineProps<{
   }>
 }>()
 
+import { usePage } from '@inertiajs/vue3';
+const { userPermissions } = usePage().props as any;
+
 const breadcrumbs: BreadcrumbItem[] = [
   {
     title: 'Dashboard',

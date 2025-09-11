@@ -30,10 +30,10 @@ class AppServiceProvider extends ServiceProvider
                     return null;
                 }
 
-                // Get user's roles
+                // Ambil role user
                 $userRoles = $user->roles->pluck('id')->toArray();
 
-                // Get menu items for user's roles
+                // Ambil menu berdasarkan role user
                 $menuItems = RoleMenu::forRoles($userRoles)
                     ->topLevel()
                     ->with('children')
@@ -41,20 +41,25 @@ class AppServiceProvider extends ServiceProvider
                     ->map(function ($menuItem) {
                         return [
                             'title' => $menuItem->title,
-                            'href' => $menuItem->href,
-                            'icon' => $menuItem->icon,
-                            'children' => $menuItem->children->map(function ($child) {
-                                return [
-                                    'title' => $child->title,
-                                    'href' => $child->href,
-                                    'icon' => $child->icon,
-                                ];
-                            }),
+                            'href'  => $menuItem->href,
+                            'icon'  => $menuItem->icon,
+                            'children' => $menuItem->children
+                                ->map(function ($child) {
+                                    return [
+                                        'title' => $child->title,
+                                        'href'  => $child->href,
+                                        'icon'  => $child->icon,
+                                    ];
+                                })
+                                ->values()
+                                ->toArray(), // pastikan children jadi array murni
                         ];
-                    });
+                    })
+                    ->values()
+                    ->toArray(); // pastikan root menu juga array murni
 
                 return [
-                    'user' => $user,
+                    'user'      => $user,
                     'menuItems' => $menuItems,
                 ];
             },

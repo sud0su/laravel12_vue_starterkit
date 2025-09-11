@@ -74,11 +74,12 @@ test('permissions can be assigned to role during creation', function () {
     $admin = User::factory()->create();
     $admin->assignRole('admin');
 
-    $permission1 = Permission::create(['name' => 'create-users']);
-    $permission2 = Permission::create(['name' => 'edit-users']);
+    // Use existing permissions from seeder
+    $permission1 = Permission::where('name', 'create users')->first();
+    $permission2 = Permission::where('name', 'edit users')->first();
 
     $roleData = [
-        'name' => 'manager',
+        'name' => 'test-manager-role',
         'guard_name' => 'web',
         'permissions' => [$permission1->id, $permission2->id],
     ];
@@ -87,9 +88,9 @@ test('permissions can be assigned to role during creation', function () {
         ->post(route('roles.store'), $roleData)
         ->assertRedirect(route('roles.index'));
 
-    $role = Role::where('name', 'manager')->first();
+    $role = Role::where('name', 'test-manager-role')->first();
     expect($role->permissions)->toHaveCount(2);
-    expect($role->permissions->pluck('name'))->toContain('create-users', 'edit-users');
+    expect($role->permissions->pluck('name'))->toContain('create users', 'edit users');
 });
 
 // READ TESTS
@@ -164,16 +165,16 @@ test('permissions can be updated on role', function () {
     $admin = User::factory()->create();
     $admin->assignRole('admin');
 
-    $role = Role::create(['name' => 'manager']);
-    $permission1 = Permission::create(['name' => 'create-users']);
-    $permission2 = Permission::create(['name' => 'edit-users']);
-    $permission3 = Permission::create(['name' => 'delete-users']);
+    $role = Role::create(['name' => 'test-update-role']);
+    $permission1 = Permission::where('name', 'create users')->first();
+    $permission2 = Permission::where('name', 'edit users')->first();
+    $permission3 = Permission::where('name', 'delete users')->first();
 
     // Initially assign 2 permissions
     $role->syncPermissions([$permission1, $permission2]);
 
     $updateData = [
-        'name' => 'manager',
+        'name' => 'test-update-role',
         'guard_name' => 'web',
         'permissions' => [$permission2->id, $permission3->id], // Change permissions
     ];
@@ -184,19 +185,19 @@ test('permissions can be updated on role', function () {
 
     $role->refresh();
     expect($role->permissions)->toHaveCount(2);
-    expect($role->permissions->pluck('name'))->toContain('edit-users', 'delete-users');
+    expect($role->permissions->pluck('name'))->toContain('edit users', 'delete users');
 });
 
 test('permissions can be removed from role', function () {
     $admin = User::factory()->create();
     $admin->assignRole('admin');
 
-    $role = Role::create(['name' => 'manager']);
-    $permission = Permission::create(['name' => 'create-users']);
+    $role = Role::create(['name' => 'test-remove-role']);
+    $permission = Permission::where('name', 'create users')->first();
     $role->syncPermissions([$permission]);
 
     $updateData = [
-        'name' => 'manager',
+        'name' => 'test-remove-role',
         'guard_name' => 'web',
         'permissions' => [], // Remove all permissions
     ];

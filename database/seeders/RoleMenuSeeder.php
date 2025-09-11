@@ -17,10 +17,10 @@ class RoleMenuSeeder extends Seeder
         $adminRole = Role::where('name', 'admin')->first();
         $managerRole = Role::where('name', 'manager')->first();
         $userRole = Role::where('name', 'user')->first();
+        $superAdminRole = Role::where('name', 'superadmin')->first();
 
-        // Admin menu items
         if ($adminRole) {
-            RoleMenu::create([
+            RoleMenu::firstOrCreate([
                 'role_id' => $adminRole->id,
                 'title' => 'Dashboard',
                 'href' => '/dashboard',
@@ -28,7 +28,7 @@ class RoleMenuSeeder extends Seeder
                 'order' => 1,
             ]);
 
-            RoleMenu::create([
+            RoleMenu::firstOrCreate([
                 'role_id' => $adminRole->id,
                 'title' => 'Users',
                 'href' => '/users',
@@ -36,7 +36,7 @@ class RoleMenuSeeder extends Seeder
                 'order' => 2,
             ]);
 
-            RoleMenu::create([
+            RoleMenu::firstOrCreate([
                 'role_id' => $adminRole->id,
                 'title' => 'Roles',
                 'href' => '/roles',
@@ -44,18 +44,17 @@ class RoleMenuSeeder extends Seeder
                 'order' => 3,
             ]);
 
-            RoleMenu::create([
+            RoleMenu::firstOrCreate([
                 'role_id' => $adminRole->id,
-                'title' => 'Settings',
-                'href' => '/settings',
-                'icon' => 'Settings',
+                'title' => 'Permissions',
+                'href' => '/permissions',
+                'icon' => 'Lock',
                 'order' => 4,
             ]);
         }
 
-        // Manager menu items
         if ($managerRole) {
-            RoleMenu::create([
+            RoleMenu::firstOrCreate([
                 'role_id' => $managerRole->id,
                 'title' => 'Dashboard',
                 'href' => '/dashboard',
@@ -63,7 +62,7 @@ class RoleMenuSeeder extends Seeder
                 'order' => 1,
             ]);
 
-            RoleMenu::create([
+            RoleMenu::firstOrCreate([
                 'role_id' => $managerRole->id,
                 'title' => 'Users',
                 'href' => '/users',
@@ -71,7 +70,7 @@ class RoleMenuSeeder extends Seeder
                 'order' => 2,
             ]);
 
-            RoleMenu::create([
+            RoleMenu::firstOrCreate([
                 'role_id' => $managerRole->id,
                 'title' => 'Reports',
                 'href' => '/reports',
@@ -80,9 +79,8 @@ class RoleMenuSeeder extends Seeder
             ]);
         }
 
-        // User menu items
         if ($userRole) {
-            RoleMenu::create([
+            RoleMenu::firstOrCreate([
                 'role_id' => $userRole->id,
                 'title' => 'Dashboard',
                 'href' => '/dashboard',
@@ -90,13 +88,29 @@ class RoleMenuSeeder extends Seeder
                 'order' => 1,
             ]);
 
-            RoleMenu::create([
+            RoleMenu::firstOrCreate([
                 'role_id' => $userRole->id,
                 'title' => 'Profile',
                 'href' => '/profile',
                 'icon' => 'User',
                 'order' => 2,
             ]);
+        }
+
+        if ($superAdminRole) {
+            // Assign all menu items to the superadmin role
+            if ($adminRole) {
+                $adminRoleMenus = $adminRole->roleMenus()->get();
+                foreach ($adminRoleMenus as $menu) {
+                    RoleMenu::firstOrCreate([
+                        'role_id' => $superAdminRole->id,
+                        'title' => $menu->title,
+                        'href' => $menu->href,
+                        'icon' => $menu->icon,
+                        'order' => $menu->order,
+                    ]);
+                }
+            }
         }
     }
 }

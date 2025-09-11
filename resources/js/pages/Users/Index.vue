@@ -38,6 +38,9 @@ defineProps<{
   }>;
 }>();
 
+const page = usePage()
+const { userPermissions } = page.props as { userPermissions?: string[] };
+
 const breadcrumbs: BreadcrumbItem[] = [
   {
     title: 'Dashboard',
@@ -57,8 +60,6 @@ const confirmDelete = (userId: number) => {
   userToDelete.value = userId
   confirmDialog.value?.show()
 }
-
-const page = usePage()
 
 const showToast = ref(false)
 const toastMessage = ref('')
@@ -114,8 +115,6 @@ const onDrop = (event: DragEvent, targetUserId: number) => {
 
   if (draggedRole.value && draggedUser.value !== targetUserId) {
     // Here you would typically make an API call to update the user's roles
-    console.log(`Moving role ${draggedRole.value} from user ${draggedUser.value} to user ${targetUserId}`);
-
     // For now, we'll just show an alert
     alert(`Role assignment would be updated: Role ${draggedRole.value} to User ${targetUserId}`);
   }
@@ -135,7 +134,7 @@ const onDrop = (event: DragEvent, targetUserId: number) => {
           <h1 class="text-2xl font-semibold text-gray-900">Users Management</h1>
           <p class="text-sm text-gray-600">Manage users and their roles with drag and drop</p>
         </div>
-        <Button as-child>
+        <Button v-if="userPermissions && userPermissions.includes('create users')" as-child>
           <Link href="/users/create" class="flex items-center gap-2">
             <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6v6m0 0v6m0-6h6m-6 0H6"></path>
@@ -157,12 +156,13 @@ const onDrop = (event: DragEvent, targetUserId: number) => {
             <div class="flex items-center justify-between">
               <CardTitle class="text-lg">{{ user.name }}</CardTitle>
               <div class="flex gap-2">
-                <Button variant="outline" size="sm" as-child>
+                <Button v-if="userPermissions && userPermissions.includes('edit users')" variant="outline" size="sm" as-child>
                   <Link :href="`/users/${user.id}/edit`">
                     Edit
                   </Link>
                 </Button>
                 <Button
+                  v-if="userPermissions && userPermissions.includes('delete users')"
                   variant="destructive"
                   size="sm"
                   @click="confirmDelete(user.id)"

@@ -2,8 +2,10 @@
 
 namespace App\Http\Middleware;
 
+use App\Models\RoleMenu;
 use Illuminate\Foundation\Inspiring;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Log;
 use Inertia\Middleware;
 
 class HandleInertiaRequests extends Middleware
@@ -38,6 +40,50 @@ class HandleInertiaRequests extends Middleware
     {
         [$message, $author] = str(Inspiring::quotes()->random())->explode('-');
 
+        $menuItems = [];
+        $userPermissions = [];
+        if ($request->user()) {
+            $user = $request->user();
+
+            // Get user permissions
+            $userPermissions = $user->getAllPermissions()->pluck('name')->toArray();
+
+            // Get role IDs for menu filtering
+            $roleIds = $user->roles->pluck('id');
+
+            // Get menu items and check permissions
+            $filteredMenus = RoleMenu::whereIn('role_id', $roleIds)
+                ->whereNull('parent_id')
+                ->orderBy('order')
+                ->get()
+                ->filter(function ($menu) use ($userPermissions) {
+                    // Extract model name from href (e.g., /users -> users)
+                    $model = str_replace('/', '', $menu->href);
+
+                    // Check if user has view permission for this model
+                    $hasViewPermission = in_array("view {$model}", $userPermissions);
+                    $hasViewOwnPermission = in_array("view own {$model}", $userPermissions);
+
+                    // Show menu if user has view or view own permission
+                    return $hasViewPermission || $hasViewOwnPermission;
+                })
+                ->map(function ($menu) {
+                    return [
+                        'title' => $menu->title,
+                        'href' => $menu->href,
+                        'icon' => $menu->icon,
+                        'order' => $menu->order,
+                    ];
+                });
+
+            // Remove duplicates based on title and href
+            $uniqueMenus = collect($filteredMenus)->unique(function ($item) {
+                return $item['title'] . '|' . $item['href'];
+            })->sortBy('order')->values();
+
+            $menuItems = $uniqueMenus->toArray();
+        }
+
         return [
             ...parent::share($request),
             'name' => config('app.name'),
@@ -45,6 +91,8 @@ class HandleInertiaRequests extends Middleware
             'auth' => [
                 'user' => $request->user(),
             ],
+            'menuItems' => $menuItems,
+            'userPermissions' => $userPermissions,
             'sidebarOpen' => ! $request->hasCookie('sidebar_state') || $request->cookie('sidebar_state') === 'true',
         ];
     }
