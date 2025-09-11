@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use Illuminate\Http\Request;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Validation\Rule;
+use Illuminate\Foundation\Auth\Access\AuthorizesRequests;
 use Inertia\Inertia;
 use Inertia\Response;
 use Spatie\Permission\Models\Role;
@@ -12,8 +13,12 @@ use Spatie\Permission\Models\Permission;
 
 class RoleController extends Controller
 {
+    use AuthorizesRequests;
+
     public function index(): Response
     {
+        $this->authorize('viewAny', Role::class);
+
         $roles = Role::with('permissions')->paginate(10);
 
         // Add permission counts grouped by model for each role
@@ -52,6 +57,8 @@ class RoleController extends Controller
 
     public function create(): Response
     {
+        $this->authorize('create', Role::class);
+
         return Inertia::render('Roles/Create', [
             'permissions' => $this->groupPermissionsByModel()
         ]);

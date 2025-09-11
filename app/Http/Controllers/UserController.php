@@ -6,6 +6,7 @@ use Illuminate\Http\Request;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Validation\Rule;
+use Illuminate\Foundation\Auth\Access\AuthorizesRequests;
 use Inertia\Inertia;
 use Inertia\Response;
 use App\Models\User;
@@ -13,14 +14,14 @@ use Spatie\Permission\Models\Role;
 
 class UserController extends Controller
 {
+    use AuthorizesRequests;
+
     public function index(): Response
     {
+        $this->authorize('viewAny', User::class);
+
         $user = auth()->user();
         $userPermissions = $user->getAllPermissions()->pluck('name')->toArray();
-
-        if (!in_array('view users', $userPermissions)) {
-            abort(403, 'Unauthorized');
-        }
 
         $users = User::with('roles')->paginate(10);
 
@@ -33,12 +34,7 @@ class UserController extends Controller
 
     public function create(): Response
     {
-        $user = auth()->user();
-        $userPermissions = $user->getAllPermissions()->pluck('name')->toArray();
-
-        if (!in_array('create users', $userPermissions)) {
-            abort(403, 'Unauthorized');
-        }
+        $this->authorize('create', User::class);
 
         return Inertia::render('Users/Create', [
             'allRoles' => Role::all()
@@ -47,12 +43,7 @@ class UserController extends Controller
 
     public function store(Request $request): RedirectResponse
     {
-        $userAuth = auth()->user();
-        $userPermissions = $userAuth->getAllPermissions()->pluck('name')->toArray();
-
-        if (!in_array('create users', $userPermissions)) {
-            abort(403, 'Unauthorized');
-        }
+        $this->authorize('create', User::class);
 
         $request->validate([
             'name' => ['required', 'string', 'max:255'],
@@ -77,17 +68,7 @@ class UserController extends Controller
 
     public function edit(User $user): Response
     {
-        $userAuth = auth()->user();
-        $userPermissions = $userAuth->getAllPermissions()->pluck('name')->toArray();
-
-        // If user has only edit own permission, check ownership
-        if (!in_array('edit users', $userPermissions) && in_array('edit own users', $userPermissions)) {
-            if ($user->id !== $userAuth->id) {
-                abort(403, 'Unauthorized');
-            }
-        } elseif (!in_array('edit users', $userPermissions)) {
-            abort(403, 'Unauthorized');
-        }
+        $this->authorize('update', $user);
 
         return Inertia::render('Users/Edit', [
             'user' => $user->load('roles'),
@@ -98,17 +79,7 @@ class UserController extends Controller
 
     public function update(Request $request, User $user): RedirectResponse
     {
-        $userAuth = auth()->user();
-        $userPermissions = $userAuth->getAllPermissions()->pluck('name')->toArray();
-
-        // If user has only edit own permission, check ownership
-        if (!in_array('edit users', $userPermissions) && in_array('edit own users', $userPermissions)) {
-            if ($user->id !== $userAuth->id) {
-                abort(403, 'Unauthorized');
-            }
-        } elseif (!in_array('edit users', $userPermissions)) {
-            abort(403, 'Unauthorized');
-        }
+        $this->authorize('update', $user);
 
         $rules = [
             'name' => ['required', 'string', 'max:255'],
@@ -148,21 +119,13 @@ class UserController extends Controller
     public function destroy(User $user): RedirectResponse
     {
         $userAuth = auth()->user();
-        $userPermissions = $userAuth->getAllPermissions()->pluck('name')->toArray();
 
         // Prevent deleting the current authenticated user
         if ($user->getKey() === $userAuth->id) {
             return redirect()->route('users.index')->with('error', 'You cannot delete your own account.');
         }
 
-        // If user has only delete own permission, check ownership
-        if (!in_array('delete users', $userPermissions) && in_array('delete own users', $userPermissions)) {
-            if ($user->id !== $userAuth->id) {
-                abort(403, 'Unauthorized');
-            }
-        } elseif (!in_array('delete users', $userPermissions)) {
-            abort(403, 'Unauthorized');
-        }
+        $this->authorize('delete', $user);
 
         $user->delete();
 

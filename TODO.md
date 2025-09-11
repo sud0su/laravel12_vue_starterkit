@@ -64,3 +64,27 @@
 - ✅ Own permissions properly enforced
 - ✅ All tests pass
 - ✅ Frontend correctly shows/hides UI elements based on permissions
+
+---
+
+## Task: Fix Manager Role Access to User Page ✅
+
+### Problem
+- Manager role with permissions (View, Create, Edit on users) was getting 403 error "User does not have the right roles" when accessing user page
+- Routes were restricted to only 'admin' role via middleware
+
+### Solution
+- Enabled wildcard permissions in config/permission.php
+- Updated routes/web.php to use dynamic permission-based middleware
+- Separated routes by model: roles.* and users.* permissions
+- This allows any user with the relevant model permissions to access the routes, including manager role
+- Solution is scalable for new models
+
+### Changes Made
+- config/permission.php: Enabled wildcard permissions
+- routes/web.php: Updated middleware to use wildcard permissions (roles.* and users.*)
+
+### Testing
+- Manager role should now be able to access user pages with their assigned permissions
+- Admin role continues to have access as before
+- Future models can use the same pattern (e.g., soals.*)
