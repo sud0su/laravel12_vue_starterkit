@@ -67,24 +67,58 @@
 
 ---
 
-## Task: Fix Manager Role Access to User Page ✅
+## Task: Fix Role-Based Access Control Issues ✅
 
 ### Problem
-- Manager role with permissions (View, Create, Edit on users) was getting 403 error "User does not have the right roles" when accessing user page
+- Manager role with user permissions getting 403 error when accessing user page
+- Admin role getting 403 error when accessing roles page
 - Routes were restricted to only 'admin' role via middleware
+- Controllers had inconsistent authorization (manual checks vs Policy-based)
 
 ### Solution
+- Updated routes/web.php to use permission-based middleware instead of role-based
 - Enabled wildcard permissions in config/permission.php
-- Updated routes/web.php to use dynamic permission-based middleware
-- Separated routes by model: roles.* and users.* permissions
-- This allows any user with the relevant model permissions to access the routes, including manager role
-- Solution is scalable for new models
+- Updated UserController to use Policy-based authorization for consistency
+- Both controllers now use Policy system (RolePolicy, UserPolicy) for granular permission checks
 
 ### Changes Made
 - config/permission.php: Enabled wildcard permissions
-- routes/web.php: Updated middleware to use wildcard permissions (roles.* and users.*)
+- routes/web.php: Changed from 'role:admin' to permission-based middleware
+- app/Http/Controllers/UserController.php: Added AuthorizesRequests trait and Policy-based authorization
 
 ### Testing
-- Manager role should now be able to access user pages with their assigned permissions
-- Admin role continues to have access as before
-- Future models can use the same pattern (e.g., soals.*)
+- Manager role should now access user pages with their permissions
+- Admin role should access both user and role pages with full permissions
+- Permission-based access is scalable for new models
+
+---
+
+## Task: Make Route Permissions Automatic and Scalable ✅
+
+### Problem
+- Routes required manual middleware configuration for each new controller
+- Adding new resource controllers needed manual permission middleware updates
+
+### Solution
+- Created custom middleware `CheckResourcePermission` that dynamically checks permissions based on route name
+- Middleware extracts resource name from route (e.g., 'users' from 'users.index') and checks corresponding permission (e.g., 'view users')
+- Registered middleware as 'resource.permission' in bootstrap/app.php
+- Updated routes/web.php to use single middleware for all resource routes
+
+### Changes Made
+- app/Http/Middleware/CheckResourcePermission.php: New custom middleware for dynamic permission checking
+- bootstrap/app.php: Registered 'resource.permission' middleware alias
+- routes/web.php: Simplified to use single 'resource.permission' middleware for all resource routes
+
+### Benefits
+- **Automatic**: Any new resource controller added will automatically have permission checks
+- **Scalable**: No need to manually add middleware for new models/controllers
+- **Dynamic**: Permission checked based on route name pattern (resource.action)
+- **Consistent**: Same permission pattern for all resources (view, create, edit, delete)
+
+### Usage
+When adding new resource controller, just add the route:
+```php
+Route::resource('newmodel', NewModelController::class);
+```
+The middleware will automatically check permissions like 'view newmodel', 'create newmodel', etc.

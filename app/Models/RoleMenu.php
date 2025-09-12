@@ -6,6 +6,9 @@ use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Spatie\Permission\Models\Role;
 
+/**
+ * @mixin IdeHelperRoleMenu
+ */
 class RoleMenu extends Model
 {
     protected $fillable = [

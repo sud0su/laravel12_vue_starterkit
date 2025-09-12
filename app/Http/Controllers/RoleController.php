@@ -10,6 +10,7 @@ use Inertia\Inertia;
 use Inertia\Response;
 use Spatie\Permission\Models\Role;
 use Spatie\Permission\Models\Permission;
+use Illuminate\Support\Facades\Gate;
 
 class RoleController extends Controller
 {
@@ -17,7 +18,10 @@ class RoleController extends Controller
 
     public function index(): Response
     {
-        $this->authorize('viewAny', Role::class);
+        // Explicitly check if the user has permission to view roles
+        if (!Gate::allows('view roles')) {
+            abort(403, 'Unauthorized action.');
+        }
 
         $roles = Role::with('permissions')->paginate(10);
 
@@ -57,7 +61,10 @@ class RoleController extends Controller
 
     public function create(): Response
     {
-        $this->authorize('create', Role::class);
+        // Explicitly check if the user has permission to create roles
+        if (!Gate::allows('create roles')) {
+            abort(403, 'Unauthorized action.');
+        }
 
         return Inertia::render('Roles/Create', [
             'permissions' => $this->groupPermissionsByModel()
@@ -66,6 +73,11 @@ class RoleController extends Controller
 
     public function store(Request $request): RedirectResponse
     {
+        // Explicitly check if the user has permission to create roles
+        if (!Gate::allows('create roles')) {
+            abort(403, 'Unauthorized action.');
+        }
+
         $request->validate([
             'name' => ['required', 'string', 'max:255', Rule::unique('roles')],
             'guard_name' => ['required', 'string', 'max:255'],
@@ -87,6 +99,11 @@ class RoleController extends Controller
 
     public function show(Role $role): Response
     {
+        // Explicitly check if the user has permission to view roles
+        if (!Gate::allows('view roles')) {
+            abort(403, 'Unauthorized action.');
+        }
+
         return Inertia::render('Roles/Show', [
             'role' => $role->load('permissions')
         ]);
@@ -94,6 +111,11 @@ class RoleController extends Controller
 
     public function edit(Role $role): Response
     {
+        // Explicitly check if the user has permission to edit roles
+        if (!Gate::allows('edit roles')) {
+            abort(403, 'Unauthorized action.');
+        }
+
         return Inertia::render('Roles/Edit', [
             'role' => $role->load('permissions'),
             'permissions' => $this->groupPermissionsByModel()
@@ -102,6 +124,11 @@ class RoleController extends Controller
 
     public function update(Request $request, Role $role): RedirectResponse
     {
+        // Explicitly check if the user has permission to edit roles
+        if (!Gate::allows('edit roles')) {
+            abort(403, 'Unauthorized action.');
+        }
+
         $request->validate([
             'name' => ['required', 'string', 'max:255', Rule::unique('roles')->ignore($role->id)],
             'guard_name' => ['required', 'string', 'max:255'],
@@ -125,6 +152,11 @@ class RoleController extends Controller
 
     public function destroy(Role $role): RedirectResponse
     {
+        // Explicitly check if the user has permission to delete roles
+        if (!Gate::allows('delete roles')) {
+            abort(403, 'Unauthorized action.');
+        }
+
         $role->delete();
 
         return redirect()->route('roles.index')->with('success', 'Role deleted successfully.');

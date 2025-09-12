@@ -12,6 +12,10 @@ class RolePolicy
      */
     public function viewAny(User $user): bool
     {
+        // Allow superadmin and admin full access
+        if ($user->hasRole('superadmin') || $user->hasRole('admin')) {
+            return true;
+        }
         return $user->hasPermissionTo('view roles');
     }
 
@@ -20,6 +24,9 @@ class RolePolicy
      */
     public function view(User $user, $role): bool
     {
+        if ($user->hasRole('superadmin') || $user->hasRole('admin')) {
+            return true;
+        }
         return $user->hasPermissionTo('view roles');
     }
 
@@ -28,6 +35,9 @@ class RolePolicy
      */
     public function create(User $user): bool
     {
+        if ($user->hasRole('superadmin') || $user->hasRole('admin')) {
+            return true;
+        }
         return $user->hasPermissionTo('create roles') || $user->hasPermissionTo('manage roles');
     }
 
@@ -36,6 +46,9 @@ class RolePolicy
      */
     public function update(User $user, $role): bool
     {
+        if ($user->hasRole('superadmin') || $user->hasRole('admin')) {
+            return true;
+        }
         return $user->hasPermissionTo('edit roles') || $user->hasPermissionTo('manage roles');
     }
 
@@ -44,6 +57,9 @@ class RolePolicy
      */
     public function delete(User $user, $role): bool
     {
+        if ($user->hasRole('superadmin') || $user->hasRole('admin')) {
+            return true;
+        }
         return $user->hasPermissionTo('delete roles') || $user->hasPermissionTo('manage roles');
     }
 
@@ -52,6 +68,9 @@ class RolePolicy
      */
     public function restore(User $user, $role): bool
     {
+        if ($user->hasRole('superadmin') || $user->hasRole('admin')) {
+            return true;
+        }
         return $user->hasPermissionTo('restore roles') || $user->hasPermissionTo('manage roles');
     }
 
@@ -60,6 +79,9 @@ class RolePolicy
      */
     public function forceDelete(User $user, $role): bool
     {
+        if ($user->hasRole('superadmin') || $user->hasRole('admin')) {
+            return true;
+        }
         return $user->hasPermissionTo('delete roles') || $user->hasPermissionTo('manage roles');
     }
 }
