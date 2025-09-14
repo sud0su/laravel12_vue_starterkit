@@ -8,6 +8,7 @@ import InputError from '@/components/InputError.vue'
 import AppLayout from '@/layouts/AppLayout.vue'
 import { type BreadcrumbItem } from '@/types'
 import { ref, computed, watch } from 'vue'
+import Toggle from '@/components/ui/toggle/Toggle.vue'
 
 const props = defineProps<{
   permissions: Record<string, Array<{
@@ -87,10 +88,8 @@ function submit() {
         <Card>
           <CardHeader>
             <CardTitle class="flex items-center gap-3">
-              <div class="w-8 h-8 rounded-lg bg-primary/10 flex items-center justify-center">
-                <svg class="w-4 h-4 text-primary" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6V4m0 2a2 2 0 100 4m0-4a2 2 0 110 4m-6 8a2 2 0 100-4m0 4a2 2 0 100 4m0-4v2m0-6V4m6 6v10m6-2a2 2 0 100-4m0 4a2 2 0 100 4m0-4v2m0-6V4"></path>
-                </svg>
+              <div class="w-8 h-8 rounded-lg bg-primary/5 flex items-center justify-center">
+                <svg class="w-4 h-4 text-primary" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 20h-2A2 2 0 0113 18V7a2 2 0 012-2h2a2 2 0 012 2v11a2 2 0 01-2 2zM7 20H5a2 2 0 01-2-2V9a2 2 0 012-2h2a2 2 0 012 2v9a2 2 0 01-2 2z"></path></svg>
               </div>
               Create New Role
             </CardTitle>
@@ -137,19 +136,18 @@ function submit() {
                   <p class="text-sm text-muted-foreground">Select permissions for this role, grouped by model</p>
                 </div>
 
-                <div class="flex items-center gap-2 mt-2">
-                  <input
-                    type="checkbox"
-                    :checked="isAllSelected === true"
+                <div class="mt-2">
+                  <Toggle
+                    id="select-all-permissions"
+                    :model-value="isAllSelected === true"
                     :indeterminate="isAllSelected === null"
-                    @change="toggleSelectAll"
-                    class="w-4 h-4 text-primary border-border rounded focus:ring-primary focus:ring-2 transition-colors"
+                    @update:model-value="toggleSelectAll"
+                    label="Select All Permissions"
                   />
-                  <Label for="select-all-permissions" class="text-sm font-medium">Select All Permissions</Label>
                 </div>
                 <div class="grid grid-cols-2 gap-4">
                   <template v-for="(permissions, model) in props.permissions" :key="model">
-                    <Card class="border-l-4 border-l-primary/20 shadow-sm hover:shadow-md transition-shadow">
+                    <Card class="border-l-2 border-l-primary/20 shadow-sm hover:shadow-md hover:border-l-primary/50 transition-all duration-200">
                       <CardHeader class="pb-4">
                         <CardTitle class="text-lg capitalize flex items-center gap-3">
                           <div class="w-4 h-4 rounded-full bg-primary/20 flex items-center justify-center">
@@ -165,13 +163,17 @@ function submit() {
                       <CardContent>
                         <div class="grid grid-cols-2 gap-2">
                           <template v-for="permission in permissions" :key="permission.id">
-                            <label class="group flex items-center space-x-3 p-4 rounded-lg border border-border/50 hover:border-primary/30 hover:bg-primary/5 transition-all cursor-pointer">
-                              <input
-                                type="checkbox"
-                                :value="permission.id"
-                                v-model="form.permissions"
-                                class="w-4 h-4 text-primary border-border rounded focus:ring-primary focus:ring-2 transition-colors"
-                              />
+                            <label :for="`permission-${permission.id}`" class="group flex items-center space-x-3 p-4 rounded-lg border border-border/50 hover:border-primary/30 hover:bg-primary/5 transition-all cursor-pointer">
+                              <Toggle
+                                :id="`permission-${permission.id}`"
+                                :model-value="form.permissions.includes(permission.id)"
+                                @update:model-value="(checked) => {
+                                    if (checked) {
+                                        form.permissions.push(permission.id)
+                                    } else {
+                                        form.permissions = form.permissions.filter(p => p !== permission.id)
+                                    }
+                                }"/>
                               <div class="flex-1 min-w-0">
                                 <div class="flex items-center gap-2">
                                   <span class="font-medium capitalize text-sm">{{ permission.action }}</span>
@@ -191,13 +193,13 @@ function submit() {
               </div>
 
               <div class="flex gap-4 pt-6 border-t">
-                <Button type="submit" :disabled="form.processing" class="flex items-center gap-2">
+                <Button type="submit" :disabled="form.processing" class="flex items-center gap-2 transition-all duration-200 hover:shadow-md">
                   <svg v-if="form.processing" class="w-4 h-4 animate-spin" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"></path>
                   </svg>
                   Create Role
                 </Button>
-                <Button variant="outline" as-child>
+                <Button variant="outline" as-child class="transition-all duration-200 hover:shadow-md">
                   <Link href="/roles">Cancel</Link>
                 </Button>
               </div>

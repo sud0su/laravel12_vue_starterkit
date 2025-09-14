@@ -141,43 +141,34 @@ function submit() {
                   <p class="text-sm text-muted-foreground">Select roles for this user (optional)</p>
                 </div>
 
-                <div class="grid grid-cols-2 gap-4">
-                  <Card class="border-l-4 border-l-primary/20 shadow-sm hover:shadow-md transition-shadow">
-                    <CardHeader class="pb-4">
-                      <CardTitle class="text-lg capitalize flex items-center gap-3">
-                        <div class="w-4 h-4 rounded-full bg-primary/20 flex items-center justify-center">
-                          <div class="w-2 h-2 rounded-full bg-primary"></div>
-                        </div>
-                        Available Roles
-                        <span class="text-sm font-normal text-muted-foreground">({{ props.allRoles.length }} roles)</span>
-                      </CardTitle>
-                      <CardDescription>
-                        Assign roles to manage user permissions
-                      </CardDescription>
-                    </CardHeader>
-                    <CardContent>
-                      <div class="grid grid-cols-1 gap-2">
-                        <template v-for="role in props.allRoles" :key="role.id">
-                          <label class="group flex items-center space-x-3 p-4 rounded-lg border border-border/50 hover:border-primary/30 hover:bg-primary/5 transition-all cursor-pointer">
-                            <input
-                              type="checkbox"
-                              :value="role.id"
-                              v-model="form.roles"
-                              class="w-4 h-4 text-primary border-border rounded focus:ring-primary focus:ring-2 transition-colors"
-                            />
-                            <div class="flex-1 min-w-0">
-                              <div class="flex items-center gap-2">
-                                <span class="font-medium capitalize text-sm">{{ role.name }}</span>
-                                <span class="text-xs text-muted-foreground bg-muted px-2 py-1 rounded-full">{{ role.guard_name }}</span>
-                              </div>
-                              <p class="text-xs text-muted-foreground mt-1">Role permissions and access control</p>
-                            </div>
-                          </label>
-                        </template>
+                <Card class="border-l-4 border-l-primary/20 shadow-sm hover:shadow-md transition-shadow">
+                  <CardHeader class="pb-4">
+                    <CardTitle class="text-lg capitalize flex items-center gap-3">
+                      <div class="w-4 h-4 rounded-full bg-primary/20 flex items-center justify-center">
+                        <div class="w-2 h-2 rounded-full bg-primary"></div>
                       </div>
-                    </CardContent>
-                  </Card>
-                </div>
+                      Available Roles
+                      <span class="text-sm font-normal text-muted-foreground">({{ props.allRoles.length }} roles)</span>
+                    </CardTitle>
+                    <CardDescription>
+                      Assign roles to manage user permissions
+                    </CardDescription>
+                  </CardHeader>
+                  <CardContent>
+                    <div class="flex flex-wrap gap-3">
+                      <template v-for="role in props.allRoles" :key="role.id">
+                        <label :for="`role-${role.id}`"
+                               class="relative flex items-center gap-3 px-4 py-2 rounded-lg border transition-all cursor-pointer"
+                               :class="{ 'border-primary bg-primary/10 shadow-sm': form.roles.includes(role.id), 'border-border/50 hover:border-primary/30 hover:bg-primary/5': !form.roles.includes(role.id) }">
+                          <svg v-if="form.roles.includes(role.id)" class="w-4 h-4 text-primary" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M5 13l4 4L19 7"></path></svg>
+                          <input :id="`role-${role.id}`" type="checkbox" :value="role.id" v-model="form.roles"
+                                 class="sr-only">
+                          <div class="font-medium capitalize text-sm">{{ role.name }}</div>
+                        </label>
+                      </template>
+                    </div>
+                  </CardContent>
+                </Card>
 
                 <InputError :message="form.errors.roles" />
               </div>
