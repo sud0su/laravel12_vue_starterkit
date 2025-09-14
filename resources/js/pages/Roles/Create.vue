@@ -7,6 +7,7 @@ import { Label } from '@/components/ui/label'
 import InputError from '@/components/InputError.vue'
 import AppLayout from '@/layouts/AppLayout.vue'
 import { type BreadcrumbItem } from '@/types'
+import { ref, computed, watch } from 'vue'
 
 const props = defineProps<{
   permissions: Record<string, Array<{
@@ -33,6 +34,38 @@ const form = useForm({
   guard_name: 'web',
   permissions: [] as number[],
 })
+
+const selectAll = ref(false)
+
+const allPermissionIds = computed(() => {
+  return Object.values(props.permissions).flat().map(p => p.id)
+})
+
+const isAllSelected = computed(() => {
+  if (form.permissions.length === allPermissionIds.value.length && allPermissionIds.value.length > 0) {
+    return true
+  }
+  if (form.permissions.length === 0) {
+    return false
+  }
+  return null // Indeterminate state
+})
+
+watch(isAllSelected, (newValue) => {
+  if (newValue === true) {
+    selectAll.value = true
+  } else if (newValue === false) {
+    selectAll.value = false
+  }
+})
+
+function toggleSelectAll() {
+  if (isAllSelected.value === true) {
+    form.permissions = []
+  } else {
+    form.permissions = allPermissionIds.value
+  }
+}
 
 function submit() {
   form.post('/roles')
@@ -104,6 +137,16 @@ function submit() {
                   <p class="text-sm text-muted-foreground">Select permissions for this role, grouped by model</p>
                 </div>
 
+                <div class="flex items-center gap-2 mt-2">
+                  <input
+                    type="checkbox"
+                    :checked="isAllSelected === true"
+                    :indeterminate="isAllSelected === null"
+                    @change="toggleSelectAll"
+                    class="w-4 h-4 text-primary border-border rounded focus:ring-primary focus:ring-2 transition-colors"
+                  />
+                  <Label for="select-all-permissions" class="text-sm font-medium">Select All Permissions</Label>
+                </div>
                 <div class="grid grid-cols-2 gap-4">
                   <template v-for="(permissions, model) in props.permissions" :key="model">
                     <Card class="border-l-4 border-l-primary/20 shadow-sm hover:shadow-md transition-shadow">
