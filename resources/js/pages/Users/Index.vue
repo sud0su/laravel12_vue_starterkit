@@ -1,6 +1,5 @@
 <script setup lang="ts">
 import AppLayout from '@/layouts/AppLayout.vue';
-// Removed import { users } from '@/routes'; because it does not exist
 import { type BreadcrumbItem } from '@/types';
 import { Head, Link, router, usePage } from '@inertiajs/vue3';
 import { ref } from 'vue';
@@ -8,7 +7,6 @@ import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import ConfirmationDialog from '@/components/ConfirmationDialog.vue';
 import Toast from '@/components/ui/toast/Toast.vue';
-// Removed Badge import because it does not exist, replaced with span with styling
 
 defineProps<{
   users: {
@@ -72,13 +70,11 @@ const handleDeleteConfirm = () => {
       onSuccess: () => {
         userToDelete.value = null;
         confirmDialog.value?.hide();
-        // Show success toast notification
         toastMessage.value = 'User deleted successfully!'
         toastType.value = 'success'
         showToast.value = true
       },
       onError: () => {
-        // Show error toast notification
         toastMessage.value = 'Failed to delete user. Please try again.'
         toastType.value = 'error'
         showToast.value = true
@@ -91,36 +87,12 @@ const handleToastClose = () => {
   showToast.value = false
 }
 
-// Drag and drop functionality
-const draggedRole = ref<number | null>(null);
-const draggedUser = ref<number | null>(null);
-
-const onDragStart = (event: DragEvent, roleId: number, userId: number) => {
-  draggedRole.value = roleId;
-  draggedUser.value = userId;
-  if (event.dataTransfer) {
-    event.dataTransfer.effectAllowed = 'move';
-  }
-};
-
+// Drag and drop functionality (simplified for this example)
 const onDragOver = (event: DragEvent) => {
   event.preventDefault();
   if (event.dataTransfer) {
     event.dataTransfer.dropEffect = 'move';
   }
-};
-
-const onDrop = (event: DragEvent, targetUserId: number) => {
-  event.preventDefault();
-
-  if (draggedRole.value && draggedUser.value !== targetUserId) {
-    // Here you would typically make an API call to update the user's roles
-    // For now, we'll just show an alert
-    alert(`Role assignment would be updated: Role ${draggedRole.value} to User ${targetUserId}`);
-  }
-
-  draggedRole.value = null;
-  draggedUser.value = null;
 };
 </script>
 
@@ -129,14 +101,14 @@ const onDrop = (event: DragEvent, targetUserId: number) => {
 
   <AppLayout :breadcrumbs="breadcrumbs">
     <div class="flex h-full flex-1 flex-col gap-4 overflow-x-auto rounded-xl p-4">
-      <div class="flex items-center justify-between">
+      <div class="flex flex-col items-start justify-between gap-4 sm:flex-row sm:items-center">
         <div>
-          <h1 class="text-2xl font-semibold text-gray-900">Users Management</h1>
-          <p class="text-sm text-gray-600">Manage users and their roles with drag and drop</p>
+          <h1 class="text-2xl font-semibold text-gray-900 dark:text-gray-100">Users Management</h1>
+          <p class="text-sm text-gray-600 dark:text-gray-400">A list of all the users in your account including their name, and email.</p>
         </div>
         <Button v-if="userPermissions && userPermissions.includes('create users')" as-child>
           <Link href="/users/create" class="flex items-center gap-2">
-            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <svg class="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6v6m0 0v6m0-6h6m-6 0H6"></path>
             </svg>
             Create User
@@ -144,13 +116,12 @@ const onDrop = (event: DragEvent, targetUserId: number) => {
         </Button>
       </div>
 
-      <div class="grid gap-3 md:grid-cols-2 lg:grid-cols-3">
+      <div class="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
         <Card
           v-for="user in users.data"
           :key="user.id"
           class="transition-all duration-200 hover:shadow-md"
           @dragover="onDragOver"
-          @drop="(event: DragEvent) => onDrop(event, user.id)"
         >
           <CardHeader>
             <div class="flex items-center justify-between">
@@ -171,22 +142,20 @@ const onDrop = (event: DragEvent, targetUserId: number) => {
                 </Button>
               </div>
             </div>
-            <p class="text-sm text-gray-600">{{ user.email }}</p>
+            <p class="text-sm text-gray-600 dark:text-gray-400">{{ user.email }}</p>
           </CardHeader>
           <CardContent>
-            <div class="space-y-1">
-              <p class="text-sm font-medium text-gray-700">Roles:</p>
-              <div class="flex flex-wrap gap-1">
+            <div class="space-y-2">
+              <p class="text-sm font-medium text-gray-700 dark:text-gray-300">Roles:</p>
+              <div class="flex min-h-[30px] flex-wrap gap-2 rounded-md border bg-slate-50 p-2 dark:border-slate-700 dark:bg-slate-800/50">
                 <span
                   v-for="role in user.roles"
                   :key="role.id"
-                  class="inline-block bg-gray-200 text-gray-700 rounded px-2 py-1 text-xs cursor-move select-none"
-                  draggable="true"
-                  @dragstart="(event: DragEvent) => onDragStart(event, role.id, user.id)"
+                  class="inline-block select-none rounded bg-gray-200 px-2 py-1 text-xs text-gray-700 dark:bg-gray-700 dark:text-gray-200"
                 >
                   {{ role.name }}
                 </span>
-                <span v-if="user.roles.length === 0" class="inline-block border border-gray-300 rounded px-2 py-1 text-xs text-gray-500">
+                <span v-if="user.roles.length === 0" class="inline-block rounded px-2 py-1 text-xs text-gray-500 dark:text-gray-400">
                   No roles assigned
                 </span>
               </div>
@@ -195,48 +164,30 @@ const onDrop = (event: DragEvent, targetUserId: number) => {
         </Card>
       </div>
 
-      <div v-if="users.data.length === 0" class="text-center py-12">
-        <svg class="w-12 h-12 text-gray-400 mx-auto mb-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+      <div v-if="users.data.length === 0" class="rounded-lg border border-dashed bg-gray-50/50 py-12 text-center dark:border-gray-700 dark:bg-gray-800/20 md:col-span-2 lg:col-span-3">
+        <svg class="mx-auto mb-4 h-12 w-12 text-gray-400 dark:text-gray-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
           <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197m13.5-9a2.5 2.5 0 11-5 0 2.5 2.5 0 015 0z"></path>
         </svg>
-        <h3 class="text-lg font-medium text-gray-900 mb-2">No users found</h3>
-        <p class="text-gray-500">Users will appear here once they register.</p>
+        <h3 class="mb-2 text-lg font-medium text-gray-900 dark:text-gray-200">No users found</h3>
+        <p class="text-gray-500 dark:text-gray-400">Get started by creating a new user.</p>
       </div>
 
       <!-- Pagination -->
       <div v-if="users.last_page > 1" class="flex justify-center">
         <div class="flex items-center gap-1">
-          <Button
-            v-for="link in users.links"
-            :key="link.label"
-            :variant="link.active ? 'default' : 'outline'"
-            as-child
-            size="sm"
-          >
-            <Link v-if="link.url" :href="link.url">{{ link.label }}</Link>
-            <span v-else>{{ link.label }}</span>
-          </Button>
+          <template v-for="(link, index) in users.links" :key="index">
+            <Button
+              v-if="link.url"
+              :variant="link.active ? 'default' : 'outline'"
+              as-child
+              size="sm"
+            >
+              <Link :href="link.url" v-html="link.label" />
+            </Button>
+            <span v-else class="px-3 py-2 text-sm text-gray-400 dark:text-gray-500" v-html="link.label" />
+          </template>
         </div>
       </div>
-
-      <!-- Available Roles for Reference -->
-      <Card class="mt-6">
-        <CardHeader>
-          <CardTitle class="text-lg">Available Roles</CardTitle>
-          <p class="text-sm text-gray-600">Drag roles from user cards to assign them to other users</p>
-        </CardHeader>
-        <CardContent>
-          <div class="flex flex-wrap gap-1">
-            <span
-              v-for="role in roles"
-              :key="role.id"
-              class="inline-block border border-gray-300 rounded px-2 py-1 text-xs text-gray-500 cursor-not-allowed opacity-50"
-            >
-              {{ role.name }}
-            </span>
-          </div>
-        </CardContent>
-      </Card>
     </div>
   </AppLayout>
 

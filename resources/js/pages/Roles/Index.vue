@@ -93,15 +93,16 @@ const handleToastClose = () => {
   <Head title="Roles Management" />
 
   <AppLayout :breadcrumbs="breadcrumbs">
-    <div class="flex h-full flex-1 flex-col gap-3 overflow-x-auto rounded-xl p-4">
-      <div class="flex items-center justify-between">
+    <div class="flex h-full flex-1 flex-col gap-4 overflow-x-auto rounded-xl p-4">
+      <div class="flex flex-col items-start justify-between gap-4 sm:flex-row sm:items-center">
         <div>
-          <h1 class="text-2xl font-bold text-gray-900">Roles Management</h1>
-          <p class="text-sm text-gray-500 mt-1">Manage user roles and permissions</p>
+          <!-- PERBAIKAN: Menambahkan class dark mode untuk judul dan deskripsi -->
+          <h1 class="text-2xl font-bold text-gray-900 dark:text-gray-100">Roles Management</h1>
+          <p class="mt-1 text-sm text-gray-500 dark:text-gray-400">Manage user roles and permissions</p>
         </div>
         <Button as-child class="transition-all duration-200 hover:shadow-md">
           <Link href="/roles/create" class="flex items-center gap-2">
-            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <svg class="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6v6m0 0v6m0-6h6m-6 0H6"></path>
             </svg>
             Create Role
@@ -109,41 +110,46 @@ const handleToastClose = () => {
         </Button>
       </div>
 
-      <div class="grid gap-3 md:grid-cols-2 lg:grid-cols-3">
-        <Card v-for="role in roles.data" :key="role.id" class="transition-all duration-200 hover:shadow-lg hover:scale-[1.02]">
+      <div class="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
+        <!-- PERBAIKAN: Mengganti hover effect dengan utility classes, menambahkan style dark mode -->
+        <Card v-for="role in roles.data" :key="role.id" class="transition-all duration-200 hover:shadow-lg hover:scale-[1.02] dark:border-gray-700 dark:hover:border-primary/50">
           <CardHeader>
             <div class="flex items-center justify-between">
-              <CardTitle class="text-lg font-semibold">{{ role.name }}</CardTitle>
-              <span class="inline-flex items-center rounded-full bg-gray-100 px-2.5 py-0.5 text-xs font-medium text-gray-600">
+              <!-- PERBAIKAN: CardTitle sudah mendukung dark mode, tidak perlu diubah -->
+              <CardTitle class="text-lg font-semibold capitalize">{{ role.name }}</CardTitle>
+              <!-- PERBAIKAN: Menambahkan class dark mode untuk badge -->
+              <span class="inline-flex items-center rounded-full bg-gray-100 px-2.5 py-0.5 text-xs font-medium text-gray-600 dark:bg-gray-700 dark:text-gray-300">
                 {{ role.guard_name }}
               </span>
             </div>
-            <CardDescription class="text-xs text-gray-500">
+            <!-- PERBAIKAN: CardDescription sudah mendukung dark mode, tidak perlu diubah -->
+            <CardDescription class="text-xs">
               Created: {{ new Date(role.created_at).toLocaleDateString() }}
             </CardDescription>
           </CardHeader>
           <CardContent>
             <div class="space-y-3">
-              <!-- Permissions Section -->
               <div v-if="role.permission_counts && role.permission_counts.length > 0">
-                <h4 class="text-xs font-semibold text-gray-500 mb-2 uppercase">PERMISSIONS</h4>
+                <!-- PERBAIKAN: Menambahkan class dark mode untuk heading section -->
+                <h4 class="mb-2 text-xs font-semibold uppercase text-gray-500 dark:text-gray-400">PERMISSIONS</h4>
                 <div class="flex flex-wrap gap-1">
+                  <!-- PERBAIKAN: Menambahkan class dark mode untuk badge permission -->
                   <span
                     v-for="permissionGroup in role.permission_counts"
                     :key="permissionGroup.model"
-                    class="inline-flex items-center gap-1 rounded-full bg-blue-50 px-2 py-0.5 text-xs font-medium text-blue-700 ring-1 ring-inset ring-blue-700/10"
+                    class="inline-flex items-center gap-1 rounded-full bg-blue-50 px-2 py-0.5 text-xs font-medium text-blue-700 ring-1 ring-inset ring-blue-700/10 dark:bg-blue-900/50 dark:text-blue-300 dark:ring-blue-400/20"
                   >
                     <span class="capitalize">{{ permissionGroup.model }}</span>
-                    <span class="bg-blue-200 text-blue-800 px-1 py-0.5 rounded-full text-xs font-semibold">
+                    <!-- PERBAIKAN: Menambahkan class dark mode untuk count di dalam badge -->
+                    <span class="rounded-full bg-blue-200 px-1 py-0.5 text-xs font-semibold text-blue-800 dark:bg-blue-500/50 dark:text-blue-100">
                       {{ permissionGroup.count }}
                     </span>
                   </span>
                 </div>
               </div>
 
-              <!-- Action Buttons -->
-              <div class="flex gap-1 pt-2 border-t">
-                <Button variant="outline" size="sm" as-child class="flex-1 transition-all duration-200 hover:shadow-md">
+              <div class="flex gap-2 border-t pt-3 dark:border-gray-700">
+                <Button variant="outline" size="sm" as-child class="flex-1">
                   <Link :href="`/roles/${role.id}/edit`">
                     Edit
                   </Link>
@@ -152,7 +158,7 @@ const handleToastClose = () => {
                   variant="destructive"
                   size="sm"
                   @click="confirmDelete(role.id)"
-                  class="flex-1 transition-all duration-200 hover:shadow-md"
+                  class="flex-1"
                 >
                   Delete
                 </Button>
@@ -161,43 +167,44 @@ const handleToastClose = () => {
           </CardContent>
         </Card>
 
-        <div v-if="roles.data.length === 0" class="text-center py-12 rounded-lg border border-dashed border-gray-300 bg-gray-50">
-          <div class="max-w-md mx-auto p-6">
-            <svg class="w-16 h-16 text-gray-400 mx-auto mb-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+        <!-- PERBAIKAN: Menambahkan class dark mode untuk state kosong -->
+        <div v-if="roles.data.length === 0" class="text-center rounded-lg border border-dashed border-gray-300 bg-gray-50 py-12 dark:border-gray-700 dark:bg-gray-800/50 md:col-span-2 lg:col-span-3">
+          <div class="mx-auto max-w-md p-6">
+            <svg class="mx-auto mb-4 h-16 w-16 text-gray-400 dark:text-gray-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197m13.5-9a2.5 2.5 0 11-5 0 2.5 2.5 0 015 0z"></path>
             </svg>
-            <h3 class="text-xl font-semibold text-gray-800 mb-2">No roles found</h3>
-            <p class="text-gray-600 mb-6">Get started by creating your first role to manage user permissions.</p>
-            <Button as-child class="transition-all duration-200 hover:shadow-md">
+            <h3 class="mb-2 text-xl font-semibold text-gray-800 dark:text-gray-200">No roles found</h3>
+            <p class="mb-6 text-gray-600 dark:text-gray-400">Get started by creating your first role to manage user permissions.</p>
+            <Button as-child>
               <Link href="/roles/create">
                 Create First Role
               </Link>
             </Button>
           </div>
         </div>
+      </div>
 
-        <!-- Pagination -->
-        <div v-if="roles.last_page > 1" class="flex justify-center">
-          <div class="flex items-center gap-1">
-            <template v-for="link in roles.links" :key="link.label">
-              <Button
-                v-if="link.url"
-                :variant="link.active ? 'default' : 'outline'"
-                as-child
-                size="sm"
-                class="transition-all duration-200 hover:shadow-sm"
-              >
-                <Link :href="link.url">{{ link.label }}</Link>
-              </Button>
-              <span v-else class="px-3 py-2 text-sm text-gray-400">{{ link.label }}</span>
-            </template>
-          </div>
+      <!-- Pagination -->
+      <div v-if="roles.last_page > 1" class="flex justify-center">
+        <div class="flex items-center gap-1">
+          <template v-for="(link, index) in roles.links" :key="index">
+            <Button
+              v-if="link.url"
+              :variant="link.active ? 'default' : 'outline'"
+              as-child
+              size="sm"
+            >
+              <!-- PERBAIKAN: Menggunakan v-html untuk render panah &raquo; dari Laravel -->
+              <Link :href="link.url" v-html="link.label" />
+            </Button>
+            <!-- PERBAIKAN: Menambahkan class dark mode untuk label non-link -->
+            <span v-else class="px-3 py-2 text-sm text-gray-400 dark:text-gray-500" v-html="link.label" />
+          </template>
         </div>
-      </div> <!-- ✅ penutup grid -->
+      </div>
     </div>
   </AppLayout>
 
-  <!-- Confirmation Dialog -->
   <ConfirmationDialog
     ref="confirmDialog"
     title="Delete Role"
@@ -209,7 +216,6 @@ const handleToastClose = () => {
     @confirm="handleDeleteConfirm"
   />
 
-  <!-- Toast Notification -->
   <Toast
     :message="toastMessage"
     :type="toastType"
@@ -217,50 +223,3 @@ const handleToastClose = () => {
     @close="handleToastClose"
   />
 </template>
-
-<style scoped>
-.card:hover {
-  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
-  transform: translateY(-4px);
-  transition: all 0.3s ease;
-}
-.card-title {
-  font-weight: 700;
-  font-size: 1.125rem;
-  color: #1f2937;
-}
-.guard-badge {
-  background-color: #e0e7ff;
-  color: #4338ca;
-  font-weight: 600;
-  padding: 0.125rem 0.5rem;
-  border-radius: 0.375rem;
-  font-size: 0.75rem;
-}
-.created-date {
-  font-size: 0.875rem;
-  color: #6b7280;
-}
-.button-group > button {
-  transition: background-color 0.3s ease;
-}
-.button-group > button:hover {
-  background-color: #4338ca;
-  color: white;
-}
-.pagination-button {
-  border-radius: 0.375rem;
-  padding: 0.5rem 0.75rem;
-  font-weight: 600;
-  cursor: pointer;
-}
-.pagination-button.active {
-  background-color: #4338ca;
-  color: white;
-  border: none;
-}
-.pagination-button:not(.active):hover {
-  background-color: #c7d2fe;
-  color: #4338ca;
-}
-</style>
