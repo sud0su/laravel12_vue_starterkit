@@ -3,10 +3,22 @@
 namespace App\Policies;
 
 use App\Models\User;
-use Illuminate\Auth\Access\Response;
 
 class UserPolicy
 {
+    /**
+     * Perform pre-authorization checks.
+     */
+    public function before(User $user, string $ability): bool|null
+    {
+        // Grant all permissions to superadmin and admin
+        if ($user->hasRole('superadmin') || $user->hasRole('admin')) {
+            return true;
+        }
+
+        return null;
+    }
+
     /**
      * Determine whether the user can view any models.
      */
@@ -20,17 +32,8 @@ class UserPolicy
      */
     public function view(User $user, User $model): bool
     {
-        // Check if user has general view permission or can view own data
-        if ($user->hasPermissionTo('view users')) {
-            return true;
-        }
-
-        // Check if user can view own data
-        if ($user->hasPermissionTo('view own users') && $user->id === $model->id) {
-            return true;
-        }
-
-        return false;
+        // A user can view their own profile, or if they have the general permission.
+        return $user->id === $model->id || $user->hasPermissionTo('view users');
     }
 
     /**
@@ -46,17 +49,9 @@ class UserPolicy
      */
     public function update(User $user, User $model): bool
     {
-        // Check if user has general edit permission
-        if ($user->hasPermissionTo('edit users')) {
-            return true;
-        }
-
-        // Check if user can edit own data
-        if ($user->hasPermissionTo('edit own users') && $user->id === $model->id) {
-            return true;
-        }
-
-        return false;
+        // A user can always update their own profile.
+        // The permission 'edit users' is for updating other users.
+        return $user->id === $model->id || $user->hasPermissionTo('edit users');
     }
 
     /**
@@ -64,22 +59,13 @@ class UserPolicy
      */
     public function delete(User $user, User $model): bool
     {
-        // Prevent deleting own account
+        // Prevent a user from deleting their own account.
         if ($user->id === $model->id) {
             return false;
         }
 
-        // Check if user has general delete permission
-        if ($user->hasPermissionTo('delete users')) {
-            return true;
-        }
-
-        // Check if user can delete own data (though this is restricted above)
-        if ($user->hasPermissionTo('delete own users') && $user->id === $model->id) {
-            return false; // Still prevent self-deletion
-        }
-
-        return false;
+        // Check if the user has the general permission to delete users.
+        return $user->hasPermissionTo('delete users');
     }
 
     /**
@@ -95,6 +81,11 @@ class UserPolicy
      */
     public function forceDelete(User $user, User $model): bool
     {
+        // Prevent a user from force-deleting their own account.
+        if ($user->id === $model->id) {
+            return false;
+        }
+
         return $user->hasPermissionTo('delete users');
     }
 }
