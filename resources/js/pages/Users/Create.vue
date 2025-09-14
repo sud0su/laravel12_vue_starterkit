@@ -18,14 +18,12 @@ const props = defineProps<{
 }>()
 
 const page = usePage();
-const authUser = computed(() => page.props.auth.user as { id: number; roles: string[] });
+const authUser = computed(() => page.props.auth.user as { id: number; roles: Array<{name: string}> });
 
-// PERBAIKAN: Menggunakan nama peran huruf kecil yang benar
 const isPrivilegedUser = computed(() => {
-  return authUser.value?.roles?.some(role => ['admin', 'superadmin'].includes(role)) ?? false;
+  return authUser.value?.roles?.some(role => ['admin', 'superadmin'].includes(role.name)) ?? false;
 });
 
-// PERBAIKAN: Filter daftar peran yang bisa ditetapkan dengan nama peran yang benar
 const availableRolesForAssignment = computed(() => {
   if (isPrivilegedUser.value) {
     return props.allRoles;

@@ -28,20 +28,16 @@ const props = defineProps<{
 }>();
 
 const page = usePage();
-const authUser = computed(() => page.props.auth.user as { id: number; roles: string[] });
+const authUser = computed(() => page.props.auth.user as { id: number; roles: Array<{name: string}> });
 
-// PERBAIKAN: Menggunakan nama peran huruf kecil
 const isPrivilegedUser = computed(() => {
-  return authUser.value?.roles?.some(role => ['admin', 'superadmin'].includes(role)) ?? false;
+  return authUser.value?.roles?.some(role => ['admin', 'superadmin'].includes(role.name)) ?? false;
 });
 
-// PERBAIKAN: Cek apakah user yang sedang diedit adalah privileged
 const targetUserIsPrivileged = computed(() => {
     return props.user.roles.some(role => ['admin', 'superadmin'].includes(role.name));
 });
 
-// --- PERBAIKAN: Redirect Guard ---
-// Jika user yang login bukan privileged, TAPI mencoba mengedit user privileged, redirect mereka.
 if (targetUserIsPrivileged.value && !isPrivilegedUser.value) {
     router.replace('/users');
 }
@@ -60,7 +56,6 @@ const form = useForm({
   roles: [...props.userRoles],
 });
 
-// ... (sisa script tidak berubah)
 const draggedRole = ref<number | null>(null);
 const draggedFromUser = ref<boolean>(false);
 const onDragStart = (event: any, roleId: number, fromUser: boolean) => {

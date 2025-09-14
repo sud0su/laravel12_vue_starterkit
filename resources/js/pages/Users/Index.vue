@@ -38,19 +38,16 @@ const props = defineProps<{
 
 const page = usePage();
 const { userPermissions } = page.props as { userPermissions?: string[] };
-const authUser = computed(() => page.props.auth.user as { id: number; roles: string[] });
+const authUser = computed(() => page.props.auth.user as { id: number; roles: Array<{name: string}> });
 
-// PERBAIKAN: Menggunakan nama peran huruf kecil yang benar: 'admin', 'superadmin'
 const isPrivilegedUser = computed(() => {
-  return authUser.value?.roles?.some(role => ['admin', 'superadmin'].includes(role)) ?? false;
+  return authUser.value?.roles?.some(role => ['admin', 'superadmin'].includes(role.name)) ?? false;
 });
 
-// PERBAIKAN: Logika filter yang benar
 const filteredUsers = computed(() => {
   if (isPrivilegedUser.value) {
     return props.users.data;
   }
-  // User biasa tidak akan melihat pengguna dengan peran 'admin' atau 'superadmin'
   return props.users.data.filter(user =>
     !user.roles.some(role => ['admin', 'superadmin'].includes(role.name))
   );
