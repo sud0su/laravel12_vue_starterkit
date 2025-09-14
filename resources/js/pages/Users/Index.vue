@@ -162,7 +162,7 @@ const handleToastClose = () => {
         <div class="flex items-center gap-1">
           <template v-for="(link, index) in users.links" :key="index">
             <Button v-if="link.url" :variant="link.active ? 'default' : 'outline'" as-child size="sm">
-              <Link :href="link.url" v-html="link.label" />
+              <Link :href="link.url"><span v-html="link.label"></span></Link>
             </Button>
             <span v-else class="px-3 py-2 text-sm text-gray-400 dark:text-gray-500" v-html="link.label" />
           </template>

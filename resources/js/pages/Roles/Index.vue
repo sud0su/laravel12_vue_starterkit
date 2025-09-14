@@ -195,7 +195,7 @@ const handleToastClose = () => {
               size="sm"
             >
               <!-- PERBAIKAN: Menggunakan v-html untuk render panah &raquo; dari Laravel -->
-              <Link :href="link.url" v-html="link.label" />
+              <Link :href="link.url"><span v-html="link.label"></span></Link>
             </Button>
             <!-- PERBAIKAN: Menambahkan class dark mode untuk label non-link -->
             <span v-else class="px-3 py-2 text-sm text-gray-400 dark:text-gray-500" v-html="link.label" />
