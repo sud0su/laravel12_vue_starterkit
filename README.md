@@ -1,4 +1,4 @@
-# Laravel CBT Online
+# Laravel Starter KIT
 
 Aplikasi ini dibangun dengan Laravel, Vue.js, dan Inertia.js.
 
