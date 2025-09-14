@@ -49,7 +49,7 @@ function submit() {
   <Head :title="`Edit Role - ${props.role.name}`" />
 
   <AppLayout :breadcrumbs="breadcrumbs">
-    <div class="flex h-full flex-1 flex-col gap-4 overflow-x-auto rounded-xl p-4">
+    <div class="flex h-full flex-1 flex-col gap-3 overflow-x-auto rounded-xl p-4">
       <div class="flex items-center">
         <Button variant="ghost" as-child>
           <Link href="/roles">&larr; Back to Roles</Link>
@@ -90,7 +90,7 @@ function submit() {
                 <InputError :message="form.errors.guard_name" />
               </div>
 
-              <div class="grid gap-6">
+              <div class="grid gap-4">
                 <div>
                   <Label class="text-base font-semibold flex items-center gap-2">
                     <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -101,7 +101,7 @@ function submit() {
                   <p class="text-sm text-muted-foreground">Select permissions for this role, grouped by model</p>
                 </div>
 
-                <div class="grid grid-cols-2 gap-6">
+                <div class="grid grid-cols-2 gap-4">
                   <template v-for="(permissions, model) in props.permissions" :key="model">
                     <Card class="border-l-4 border-l-primary/20 shadow-sm hover:shadow-md transition-shadow">
                       <CardHeader class="pb-4">
@@ -117,7 +117,7 @@ function submit() {
                         </CardDescription>
                       </CardHeader>
                       <CardContent>
-                        <div class="grid grid-cols-2 gap-3">
+                        <div class="grid grid-cols-2 gap-2">
                           <template v-for="permission in permissions" :key="permission.id">
                             <label class="group flex items-center space-x-3 p-4 rounded-lg border border-border/50 hover:border-primary/30 hover:bg-primary/5 transition-all cursor-pointer">
                               <input

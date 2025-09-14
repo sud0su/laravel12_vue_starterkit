@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { Head, Link, router, usePage } from '@inertiajs/vue3'
+import { Head, Link, router } from '@inertiajs/vue3'
 import { Button } from '@/components/ui/button'
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
 import AppLayout from '@/layouts/AppLayout.vue'
@@ -52,7 +52,7 @@ const breadcrumbs: BreadcrumbItem[] = [
   },
 ]
 
-const page = usePage()
+
 
 // Confirmation dialog
 const confirmDialog = ref<InstanceType<typeof ConfirmationDialog>>()
@@ -97,7 +97,7 @@ const handleToastClose = () => {
   <Head title="Roles Management" />
 
   <AppLayout :breadcrumbs="breadcrumbs">
-    <div class="flex h-full flex-1 flex-col gap-4 overflow-x-auto rounded-xl p-4">
+    <div class="flex h-full flex-1 flex-col gap-3 overflow-x-auto rounded-xl p-4">
       <div class="flex items-center justify-between">
         <div>
           <h1 class="text-2xl font-semibold text-gray-900">Roles Management</h1>
@@ -113,7 +113,7 @@ const handleToastClose = () => {
         </Button>
       </div>
 
-      <div class="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
+      <div class="grid gap-3 md:grid-cols-2 lg:grid-cols-3">
         <Card v-for="role in roles.data" :key="role.id">
           <CardHeader>
             <div class="flex items-center justify-between">
@@ -127,11 +127,11 @@ const handleToastClose = () => {
             </CardDescription>
           </CardHeader>
           <CardContent>
-            <div class="space-y-4">
+            <div class="space-y-3">
               <!-- Permissions Section -->
               <div v-if="role.permission_counts && role.permission_counts.length > 0">
                 <h4 class="text-sm font-semibold text-muted-foreground mb-2">PERMISSIONS</h4>
-                <div class="flex flex-wrap gap-2">
+                <div class="flex flex-wrap gap-1">
                   <span
                     v-for="permissionGroup in role.permission_counts"
                     :key="permissionGroup.model"
@@ -146,7 +146,7 @@ const handleToastClose = () => {
               </div>
 
               <!-- Action Buttons -->
-              <div class="flex gap-2 pt-2 border-t">
+              <div class="flex gap-1 pt-2 border-t">
                 <Button variant="outline" size="sm" as-child class="flex-1">
                   <Link :href="`/roles/${role.id}/edit`">
                     Edit

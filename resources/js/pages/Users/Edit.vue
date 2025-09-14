@@ -110,7 +110,7 @@ const submit = () => {
   <Head title="Edit User" />
 
   <AppLayout :breadcrumbs="breadcrumbs">
-    <div class="flex h-full flex-1 flex-col gap-4 overflow-x-auto rounded-xl p-4">
+    <div class="flex h-full flex-1 flex-col gap-3 overflow-x-auto rounded-xl p-4">
       <div class="flex items-center justify-between">
         <div>
           <h1 class="text-2xl font-semibold text-gray-900">Edit User</h1>
@@ -121,13 +121,13 @@ const submit = () => {
         </Button>
       </div>
 
-      <div class="grid gap-6 md:grid-cols-2">
+      <div class="grid gap-4 md:grid-cols-2">
         <!-- User Information -->
         <Card>
           <CardHeader>
             <CardTitle>User Information</CardTitle>
           </CardHeader>
-          <CardContent class="space-y-4">
+          <CardContent class="space-y-3">
             <div>
               <Label for="name">Name</Label>
               <Input
@@ -165,7 +165,7 @@ const submit = () => {
               </h3>
               <p class="text-xs text-gray-500 mb-4">Leave blank if you don't want to change the password</p>
 
-              <div class="space-y-3">
+              <div class="space-y-2">
                 <div>
                   <Label for="password">New Password</Label>
                   <Input
@@ -214,7 +214,7 @@ const submit = () => {
             <CardTitle>Role Management</CardTitle>
             <p class="text-sm text-gray-600">Drag roles between sections to assign or remove them</p>
           </CardHeader>
-          <CardContent class="space-y-6">
+          <CardContent class="space-y-4">
             <!-- User's Current Roles -->
             <div>
               <h3 class="text-sm font-medium text-gray-700 mb-2">User's Roles</h3>
@@ -224,7 +224,7 @@ const submit = () => {
                 @dragover="onDragOver"
                 @drop="onDropToUser"
               >
-                <div class="flex flex-wrap gap-2">
+                <div class="flex flex-wrap gap-1">
                   <span
                     v-for="roleId in form.roles"
                     :key="roleId"
@@ -250,7 +250,7 @@ const submit = () => {
                 @dragover="onDragOver"
                 @drop="onDropToAvailable"
               >
-                <div class="flex flex-wrap gap-2">
+                <div class="flex flex-wrap gap-1">
                   <span
                     v-for="role in allRoles.filter(r => !form.roles.includes(r.id))"
                     :key="role.id"

@@ -16,8 +16,7 @@ const props = defineProps<{
   }>
 }>()
 
-import { usePage } from '@inertiajs/vue3';
-const { userPermissions } = usePage().props as any;
+
 
 const breadcrumbs: BreadcrumbItem[] = [
   {
@@ -51,7 +50,7 @@ function submit() {
   <Head title="Create User" />
 
   <AppLayout :breadcrumbs="breadcrumbs">
-    <div class="flex h-full flex-1 flex-col gap-4 overflow-x-auto rounded-xl p-4">
+    <div class="flex h-full flex-1 flex-col gap-3 overflow-x-auto rounded-xl p-4">
       <div class="flex items-center">
         <Button variant="ghost" as-child>
           <Link href="/users">&larr; Back to Users</Link>
@@ -74,8 +73,8 @@ function submit() {
             </CardDescription>
           </CardHeader>
           <CardContent>
-            <form @submit.prevent="submit" class="space-y-8">
-              <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+            <form @submit.prevent="submit" class="space-y-6">
+              <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
                 <div class="grid gap-2">
                   <Label for="name">Full Name</Label>
                   <Input
@@ -103,7 +102,7 @@ function submit() {
                 </div>
               </div>
 
-              <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+              <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
                 <div class="grid gap-2">
                   <Label for="password">Password</Label>
                   <Input
@@ -131,7 +130,7 @@ function submit() {
                 </div>
               </div>
 
-              <div class="grid gap-6">
+              <div class="grid gap-4">
                 <div>
                   <Label class="text-base font-semibold flex items-center gap-2">
                     <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -142,7 +141,7 @@ function submit() {
                   <p class="text-sm text-muted-foreground">Select roles for this user (optional)</p>
                 </div>
 
-                <div class="grid grid-cols-2 gap-6">
+                <div class="grid grid-cols-2 gap-4">
                   <Card class="border-l-4 border-l-primary/20 shadow-sm hover:shadow-md transition-shadow">
                     <CardHeader class="pb-4">
                       <CardTitle class="text-lg capitalize flex items-center gap-3">
@@ -157,7 +156,7 @@ function submit() {
                       </CardDescription>
                     </CardHeader>
                     <CardContent>
-                      <div class="grid grid-cols-1 gap-3">
+                      <div class="grid grid-cols-1 gap-2">
                         <template v-for="role in props.allRoles" :key="role.id">
                           <label class="group flex items-center space-x-3 p-4 rounded-lg border border-border/50 hover:border-primary/30 hover:bg-primary/5 transition-all cursor-pointer">
                             <input

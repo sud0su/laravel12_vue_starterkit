@@ -144,7 +144,7 @@ const onDrop = (event: DragEvent, targetUserId: number) => {
         </Button>
       </div>
 
-      <div class="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
+      <div class="grid gap-3 md:grid-cols-2 lg:grid-cols-3">
         <Card
           v-for="user in users.data"
           :key="user.id"
@@ -174,7 +174,7 @@ const onDrop = (event: DragEvent, targetUserId: number) => {
             <p class="text-sm text-gray-600">{{ user.email }}</p>
           </CardHeader>
           <CardContent>
-            <div class="space-y-2">
+            <div class="space-y-1">
               <p class="text-sm font-medium text-gray-700">Roles:</p>
               <div class="flex flex-wrap gap-1">
                 <span
@@ -226,7 +226,7 @@ const onDrop = (event: DragEvent, targetUserId: number) => {
           <p class="text-sm text-gray-600">Drag roles from user cards to assign them to other users</p>
         </CardHeader>
         <CardContent>
-          <div class="flex flex-wrap gap-2">
+          <div class="flex flex-wrap gap-1">
             <span
               v-for="role in roles"
               :key="role.id"
