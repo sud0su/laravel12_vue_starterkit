@@ -1,6 +1,6 @@
 # Laravel CBT Online
 
-Aplikasi Computer-Based Test (CBT) Online yang dibangun dengan Laravel, Vue.js, dan Inertia.js.
+Aplikasi ini dibangun dengan Laravel, Vue.js, dan Inertia.js.
 
 ## Tentang Proyek
 
