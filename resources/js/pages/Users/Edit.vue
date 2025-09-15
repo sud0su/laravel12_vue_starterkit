@@ -4,7 +4,8 @@ import { type BreadcrumbItem } from '@/types';
 import { Head, Link, useForm, usePage, router } from '@inertiajs/vue3';
 import { computed, ref } from 'vue';
 import { Button } from '@/components/ui/button';
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from '@/components/ui/card';
+import InputError from '@/components/InputError.vue';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 
@@ -98,55 +99,53 @@ const submit = () => {
 
   <AppLayout :breadcrumbs="breadcrumbs">
     <div class="flex h-full flex-1 flex-col gap-4 overflow-x-auto rounded-xl p-4">
-      <div class="flex flex-col items-start justify-between gap-4 sm:flex-row sm:items-center">
-        <div>
-          <h1 class="text-2xl font-semibold text-gray-900 dark:text-gray-100">Edit User</h1>
-          <p class="text-sm text-gray-600 dark:text-gray-400">Update user information and manage roles.</p>
-        </div>
-        <Button variant="outline" as-child>
-          <Link href="/users">Back to Users</Link>
+      <div class="flex items-center justify-end">
+        <Button variant="ghost" as-child>
+          <Link href="/users">Back to Users &rarr;</Link>
         </Button>
       </div>
 
       <div class="grid gap-4" :class="{ 'md:grid-cols-2': isPrivilegedUser }">
         <Card>
-          <CardHeader>
-            <CardTitle>User Information</CardTitle>
-          </CardHeader>
-          <CardContent class="space-y-4">
-            <div>
-              <Label for="name">Name</Label>
-              <Input id="name" v-model="form.name" placeholder="Enter user name" />
-              <p v-if="form.errors.name" class="mt-1 text-sm text-red-600 dark:text-red-400">{{ form.errors.name }}</p>
-            </div>
-            <div>
-              <Label for="email">Email</Label>
-              <Input id="email" type="email" v-model="form.email" placeholder="Enter user email" />
-              <p v-if="form.errors.email" class="mt-1 text-sm text-red-600 dark:text-red-400">{{ form.errors.email }}</p>
-            </div>
-            <div class="border-t pt-4 dark:border-gray-700">
-              <h3 class="mb-3 flex items-center gap-2 text-sm font-medium text-gray-700 dark:text-gray-300">
-                <svg class="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z"></path></svg>
-                Change Password (Optional)
-              </h3>
-              <p class="mb-4 text-xs text-gray-500 dark:text-gray-400">Leave blank if you don't want to change the password.</p>
-              <div class="space-y-3">
-                <div>
-                  <Label for="password">New Password</Label>
-                  <Input id="password" type="password" v-model="form.password" placeholder="Enter new password" autocomplete="new-password" />
-                  <p v-if="form.errors.password" class="mt-1 text-sm text-red-600 dark:text-red-400">{{ form.errors.password }}</p>
-                </div>
-                <div>
-                  <Label for="password_confirmation">Confirm New Password</Label>
-                  <Input id="password_confirmation" type="password" v-model="form.password_confirmation" placeholder="Confirm new password" autocomplete="new-password" />
-                  <p v-if="form.errors.password_confirmation" class="mt-1 text-sm text-red-600 dark:text-red-400">{{ form.errors.password_confirmation }}</p>
+          <form @submit.prevent="submit">
+            <CardHeader>
+              <CardTitle>User Information</CardTitle>
+              <CardDescription>Update the user's profile information.</CardDescription>
+            </CardHeader>
+            <CardContent class="space-y-6">
+              <div class="grid gap-2">
+                <Label for="name">Name</Label>
+                <Input id="name" v-model="form.name" placeholder="e.g. John Doe" />
+                <InputError :message="form.errors.name" />
+              </div>
+              <div class="grid gap-2">
+                <Label for="email">Email</Label>
+                <Input id="email" type="email" v-model="form.email" placeholder="e.g. john@example.com" />
+                <InputError :message="form.errors.email" />
+              </div>
+              <div class="space-y-4 border-t pt-6">
+                <h3 class="text-lg font-medium">Change Password</h3>
+                <p class="text-sm text-muted-foreground">Leave blank if you don't want to change the password.</p>
+                <div class="grid grid-cols-1 gap-4 md:grid-cols-2">
+                  <div class="grid gap-2">
+                    <Label for="password">New Password</Label>
+                    <Input id="password" type="password" v-model="form.password" placeholder="Enter new password" autocomplete="new-password" />
+                    <InputError :message="form.errors.password" />
+                  </div>
+                  <div class="grid gap-2">
+                    <Label for="password_confirmation">Confirm New Password</Label>
+                    <Input id="password_confirmation" type="password" v-model="form.password_confirmation" placeholder="Confirm new password" autocomplete="new-password" />
+                    <InputError :message="form.errors.password_confirmation" />
+                  </div>
                 </div>
               </div>
-            </div>
-            <Button @click="submit" :disabled="form.processing" class="w-full !mt-6">
-              {{ form.processing ? 'Updating...' : 'Update User' }}
-            </Button>
-          </CardContent>
+            </CardContent>
+            <CardFooter class="flex justify-end border-t pt-6">
+              <Button type="submit" :disabled="form.processing">
+                {{ form.processing ? 'Updating...' : 'Update User' }}
+              </Button>
+            </CardFooter>
+          </form>
         </Card>
 
         <Card v-if="isPrivilegedUser">
@@ -154,26 +153,33 @@ const submit = () => {
             <CardTitle>Role Management</CardTitle>
             <p class="text-sm text-gray-600 dark:text-gray-400">Drag roles to assign or remove them.</p>
           </CardHeader>
-          <CardContent class="space-y-4">
-            <div>
-              <h3 class="mb-2 text-sm font-medium text-gray-700 dark:text-gray-300">User's Roles</h3>
-              <div class="min-h-[100px] rounded-lg border-2 border-dashed border-gray-300 p-4 transition-colors dark:border-gray-600" :class="{ 'border-blue-400 bg-blue-50 dark:border-blue-600 dark:bg-blue-900/20': draggedRole && !draggedFromUser }" @dragover="onDragOver" @drop="onDropToUser">
+          <CardContent class="grid grid-cols-1 gap-6 md:grid-cols-2">
+            <div class="space-y-2">
+              <h3 class="flex items-center gap-2 text-lg font-medium">
+                <svg class="h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.653-.124-1.28-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.653.124-1.28.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z"></path></svg>
+                User's Roles
+              </h3>
+              <div class="min-h-[200px] rounded-lg border-2 border-dashed p-4 transition-colors" :class="{ 'border-primary bg-primary/10': draggedRole && !draggedFromUser }" @dragover="onDragOver" @drop="onDropToUser">
                 <div class="flex flex-wrap gap-2">
-                  <span v-for="roleId in form.roles" :key="roleId" class="inline-block select-none cursor-move rounded bg-blue-100 px-3 py-1 text-sm text-blue-800 dark:bg-blue-900/50 dark:text-blue-200" draggable="true" @dragstart="(event) => onDragStart(event, roleId, true)">
-                    {{ allRoles.find(r => r.id === roleId)?.name }}
-                  </span>
-                  <span v-if="form.roles.length === 0" class="text-sm text-gray-500 dark:text-gray-400">No roles assigned.</span>
+                  <div v-for="roleId in form.roles" :key="roleId" class="flex cursor-move items-center gap-2 rounded-full bg-primary/10 px-3 py-1 text-sm font-medium text-primary" draggable="true" @dragstart="(event) => onDragStart(event, roleId, true)">
+                    <span>{{ allRoles.find(r => r.id === roleId)?.name }}</span>
+                    <button type="button" @click="form.roles = form.roles.filter(r => r !== roleId)" class="text-primary/50 hover:text-primary">&times;</button>
+                  </div>
+                  <p v-if="form.roles.length === 0" class="text-sm text-muted-foreground">Drag roles here to assign.</p>
                 </div>
               </div>
             </div>
-            <div>
-              <h3 class="mb-2 text-sm font-medium text-gray-700 dark:text-gray-300">Available Roles</h3>
-              <div class="min-h-[100px] rounded-lg border-2 border-dashed border-gray-300 p-4 transition-colors dark:border-gray-600" :class="{ 'border-red-400 bg-red-50 dark:border-red-600 dark:bg-red-900/20': draggedRole && draggedFromUser }" @dragover="onDragOver" @drop="onDropToAvailable">
+            <div class="space-y-2">
+              <h3 class="flex items-center gap-2 text-lg font-medium">
+                <svg class="h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16"></path></svg>
+                Available Roles
+              </h3>
+              <div class="min-h-[200px] rounded-lg border-2 border-dashed p-4 transition-colors" :class="{ 'border-destructive bg-destructive/10': draggedRole && draggedFromUser }" @dragover="onDragOver" @drop="onDropToAvailable">
                 <div class="flex flex-wrap gap-2">
-                  <span v-for="role in allRoles.filter(r => !form.roles.includes(r.id))" :key="role.id" class="inline-block select-none cursor-move rounded bg-gray-100 px-3 py-1 text-sm text-gray-700 dark:bg-gray-700 dark:text-gray-200" draggable="true" @dragstart="(event) => onDragStart(event, role.id, false)">
+                  <div v-for="role in allRoles.filter(r => !form.roles.includes(r.id))" :key="role.id" class="cursor-move rounded-full bg-muted px-3 py-1 text-sm font-medium text-muted-foreground" draggable="true" @dragstart="(event) => onDragStart(event, role.id, false)">
                     {{ role.name }}
-                  </span>
-                  <span v-if="allRoles.filter(r => !form.roles.includes(r.id)).length === 0" class="text-sm text-gray-500 dark:text-gray-400">All roles are assigned.</span>
+                  </div>
+                  <p v-if="allRoles.filter(r => !form.roles.includes(r.id)).length === 0" class="text-sm text-muted-foreground">All roles have been assigned.</p>
                 </div>
               </div>
             </div>

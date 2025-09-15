@@ -46,7 +46,7 @@ class RoleController extends Controller
         $this->authorize('create', Role::class);
 
         return Inertia::render('Roles/Create', [
-            'permissions' => $this->groupPermissionsByModel()
+            'permissions' => $this->getGroupedPermissions()
         ]);
     }
 
@@ -88,7 +88,7 @@ class RoleController extends Controller
 
         return Inertia::render('Roles/Edit', [
             'role' => $role->load('permissions'),
-            'permissions' => $this->groupPermissionsByModel()
+            'permissions' => $this->getGroupedPermissions()
         ]);
     }
 
@@ -122,11 +122,21 @@ class RoleController extends Controller
         return redirect()->route('roles.index')->with('success', 'Role deleted successfully.');
     }
 
-    private function groupPermissionsByModel()
+    private function getGroupedPermissions()
     {
-        return Permission::all()->groupBy(function ($permission) {
+        $permissions = Permission::all()->groupBy(function ($permission) {
             $parts = explode(' ', $permission->name);
             return count($parts) > 1 ? $parts[1] : 'global';
         });
+
+        $models = ['roles', 'users', 'soals'];
+
+        $resourcePermissions = $permissions->filter(fn($v, $k) => in_array($k, $models));
+        $managementPermissions = $permissions->filter(fn($v, $k) => !in_array($k, $models));
+
+        return [
+            'resource' => $resourcePermissions,
+            'management' => $managementPermissions,
+        ];
     }
 }

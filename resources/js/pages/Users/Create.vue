@@ -55,9 +55,9 @@ function submit() {
 
   <AppLayout :breadcrumbs="breadcrumbs">
     <div class="flex h-full flex-1 flex-col gap-3 overflow-x-auto rounded-xl p-4">
-      <div class="flex items-center">
+      <div class="flex items-center justify-end">
         <Button variant="ghost" as-child>
-          <Link href="/users">&larr; Back to Users</Link>
+          <Link href="/users">Back to Users &rarr;</Link>
         </Button>
       </div>
 
@@ -71,75 +71,65 @@ function submit() {
               Create New User
             </CardTitle>
             <CardDescription>
-              Add a new user to the system and assign roles
+              Fill in the details below to create a new user account.
             </CardDescription>
           </CardHeader>
-          <CardContent>
-            <form @submit.prevent="submit" class="space-y-6">
-              <div class="grid grid-cols-1 gap-4 md:grid-cols-2">
-                <div class="grid gap-2">
-                  <Label for="name">Full Name</Label>
-                  <Input id="name" v-model="form.name" type="text" placeholder="Enter full name" required autocomplete="name" />
-                  <InputError :message="form.errors.name" />
-                </div>
-                <div class="grid gap-2">
-                  <Label for="email">Email Address</Label>
-                  <Input id="email" v-model="form.email" type="email" placeholder="Enter email address" required autocomplete="username" />
-                  <InputError :message="form.errors.email" />
-                </div>
-              </div>
-              <div class="grid grid-cols-1 gap-4 md:grid-cols-2">
-                <div class="grid gap-2">
-                  <Label for="password">Password</Label>
-                  <Input id="password" v-model="form.password" type="password" placeholder="Enter password" required autocomplete="new-password" />
-                  <InputError :message="form.errors.password" />
-                </div>
-                <div class="grid gap-2">
-                  <Label for="password_confirmation">Confirm Password</Label>
-                  <Input id="password_confirmation" v-model="form.password_confirmation" type="password" placeholder="Confirm password" required autocomplete="new-password" />
-                  <InputError :message="form.errors.password_confirmation" />
+          <form @submit.prevent="submit">
+            <CardContent class="space-y-8">
+              <div class="space-y-4">
+                <h3 class="text-lg font-medium">User Information</h3>
+                <div class="grid grid-cols-1 gap-4 md:grid-cols-2">
+                  <div class="grid gap-2">
+                    <Label for="name">Full Name</Label>
+                    <Input id="name" v-model="form.name" type="text" placeholder="e.g. John Doe" required autocomplete="name" />
+                    <InputError :message="form.errors.name" />
+                  </div>
+                  <div class="grid gap-2">
+                    <Label for="email">Email Address</Label>
+                    <Input id="email" v-model="form.email" type="email" placeholder="e.g. john@example.com" required autocomplete="username" />
+                    <InputError :message="form.errors.email" />
+                  </div>
                 </div>
               </div>
-              <div class="grid gap-4">
-                <div>
-                  <Label class="flex items-center gap-2 text-base font-semibold">
-                    <svg class="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
-                    Roles
-                  </Label>
-                  <p class="text-sm text-muted-foreground">Select roles for this user (optional)</p>
+              <div class="space-y-4">
+                <h3 class="text-lg font-medium">Password</h3>
+                <div class="grid grid-cols-1 gap-4 md:grid-cols-2">
+                  <div class="grid gap-2">
+                    <Label for="password">Password</Label>
+                    <Input id="password" v-model="form.password" type="password" placeholder="Enter a secure password" required autocomplete="new-password" />
+                    <InputError :message="form.errors.password" />
+                  </div>
+                  <div class="grid gap-2">
+                    <Label for="password_confirmation">Confirm Password</Label>
+                    <Input id="password_confirmation" v-model="form.password_confirmation" type="password" placeholder="Confirm the password" required autocomplete="new-password" />
+                    <InputError :message="form.errors.password_confirmation" />
+                  </div>
                 </div>
-                <Card class="border-l-4 border-l-primary/20 shadow-sm transition-shadow hover:shadow-md">
-                  <CardHeader class="pb-4">
-                    <CardTitle class="flex items-center gap-3 text-lg capitalize">
-                      <div class="flex h-4 w-4 items-center justify-center rounded-full bg-primary/20 dark:bg-primary/30"><div class="h-2 w-2 rounded-full bg-primary dark:bg-primary-400"></div></div>
-                      Available Roles
-                      <span class="text-sm font-normal text-muted-foreground">({{ availableRolesForAssignment.length }} roles)</span>
-                    </CardTitle>
-                    <CardDescription>Assign roles to manage user permissions</CardDescription>
-                  </CardHeader>
-                  <CardContent>
-                    <div class="flex flex-wrap gap-3">
-                      <template v-for="role in availableRolesForAssignment" :key="role.id">
-                        <label :for="`role-${role.id}`" class="relative flex cursor-pointer items-center gap-3 rounded-lg border px-4 py-2 transition-all" :class="{ 'border-primary bg-primary/10 shadow-sm dark:border-primary/80 dark:bg-primary/20': form.roles.includes(role.id), 'border-border/50 hover:border-primary/30 hover:bg-primary/5 dark:hover:border-primary/40 dark:hover:bg-primary/10': !form.roles.includes(role.id) }">
-                          <svg v-if="form.roles.includes(role.id)" class="h-4 w-4 text-primary dark:text-primary-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M5 13l4 4L19 7"></path></svg>
-                          <input :id="`role-${role.id}`" type="checkbox" :value="role.id" v-model="form.roles" class="sr-only">
-                          <div class="text-sm font-medium capitalize">{{ role.name }}</div>
-                        </label>
-                      </template>
-                    </div>
-                  </CardContent>
-                </Card>
+              </div>
+              <div class="space-y-4">
+                <h3 class="text-lg font-medium">Assign Roles</h3>
+                <div class="rounded-lg border p-4">
+                  <div class="flex flex-wrap gap-3">
+                    <template v-for="role in availableRolesForAssignment" :key="role.id">
+                      <label :for="`role-${role.id}`" class="relative flex cursor-pointer items-center gap-3 rounded-lg border px-4 py-2 transition-all" :class="{ 'border-primary bg-primary/10 shadow-sm dark:border-primary/80 dark:bg-primary/20': form.roles.includes(role.id), 'border-border/50 hover:border-primary/30 hover:bg-primary/5 dark:hover:border-primary/40 dark:hover:bg-primary/10': !form.roles.includes(role.id) }">
+                        <svg v-if="form.roles.includes(role.id)" class="h-4 w-4 text-primary dark:text-primary-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M5 13l4 4L19 7"></path></svg>
+                        <input :id="`role-${role.id}`" type="checkbox" :value="role.id" v-model="form.roles" class="sr-only">
+                        <div class="text-sm font-medium capitalize">{{ role.name }}</div>
+                      </label>
+                    </template>
+                  </div>
+                </div>
                 <InputError :message="form.errors.roles" />
               </div>
-              <div class="flex gap-4 border-t pt-6">
-                <Button type="submit" :disabled="form.processing" class="flex items-center gap-2">
-                  <svg v-if="form.processing" class="h-4 w-4 animate-spin" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"></path></svg>
-                  Create User
-                </Button>
-                <Button variant="outline" as-child><Link href="/users">Cancel</Link></Button>
-              </div>
-            </form>
-          </CardContent>
+            </CardContent>
+            <CardFooter class="flex justify-end gap-4 border-t pt-6">
+              <Button variant="outline" as-child><Link href="/users">Cancel</Link></Button>
+              <Button type="submit" :disabled="form.processing" class="flex items-center gap-2">
+                <svg v-if="form.processing" class="h-4 w-4 animate-spin" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"></path></svg>
+                Create User
+              </Button>
+            </CardFooter>
+          </form>
         </Card>
       </div>
     </div>

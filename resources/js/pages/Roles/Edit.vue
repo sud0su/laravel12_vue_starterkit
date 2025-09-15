@@ -9,6 +9,7 @@ import AppLayout from '@/layouts/AppLayout.vue'
 import { type BreadcrumbItem } from '@/types'
 import { ref, computed, watch } from 'vue'
 import Toggle from '@/components/ui/toggle/Toggle.vue'
+import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs'
 
 const props = defineProps<{
   role: {
@@ -17,12 +18,20 @@ const props = defineProps<{
     guard_name: string
     permissions: Array<{ id: number; name: string }>
   }
-  permissions: Record<string, Array<{
-    id: number
-    name: string
-    model: string
-    action: string
-  }>>
+  permissions: {
+    resource: Record<string, Array<{
+      id: number
+      name: string
+      model: string
+      action: string
+    }>>
+    management: Record<string, Array<{
+      id: number
+      name: string
+      model: string
+      action: string
+    }>>
+  }
 }>()
 
 const breadcrumbs: BreadcrumbItem[] = [
@@ -45,8 +54,12 @@ const form = useForm({
 const selectAll = ref(false)
 
 const allPermissionIds = computed(() => {
-  return Object.values(props.permissions).flat().map(p => p.id)
+  const resourcePermissions = Object.values(props.permissions.resource).flat().map(p => p.id)
+  const managementPermissions = Object.values(props.permissions.management).flat().map(p => p.id)
+  return [...resourcePermissions, ...managementPermissions]
 })
+
+const permissionGroups = computed(() => Object.keys(props.permissions))
 
 const isAllSelected = computed(() => {
   if (form.permissions.length === allPermissionIds.value.length && allPermissionIds.value.length > 0) {
@@ -84,9 +97,9 @@ function submit() {
 
   <AppLayout :breadcrumbs="breadcrumbs">
     <div class="flex h-full flex-1 flex-col gap-3 overflow-x-auto rounded-xl p-4">
-      <div class="flex items-center">
+      <div class="flex items-center justify-end">
         <Button variant="ghost" as-child>
-          <Link href="/roles">&larr; Back to Roles</Link>
+          <Link href="/roles">Back to Roles &rarr;</Link>
         </Button>
       </div>
 
@@ -105,41 +118,40 @@ function submit() {
           </CardHeader>
           <CardContent>
             <form @submit.prevent="submit" class="space-y-6">
-              <div class="grid gap-2">
-                <Label for="name">Role Name</Label>
-                <Input
-                  id="name"
-                  v-model="form.name"
-                  type="text"
-                  placeholder="Enter role name"
-                  required
-                />
-                <InputError :message="form.errors.name" />
-              </div>
-
-              <div class="grid gap-2">
-                <Label for="guard_name">Guard Name</Label>
-                <Input
-                  id="guard_name"
-                  v-model="form.guard_name"
-                  type="text"
-                  placeholder="web"
-                  required
-                />
-                <InputError :message="form.errors.guard_name" />
-              </div>
-
-              <div class="grid gap-4">
-                <div>
-                  <Label class="text-base font-semibold flex items-center gap-2">
-                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path>
-                    </svg>
-                    Permissions
-                  </Label>
-                  <p class="text-sm text-muted-foreground">Select permissions for this role, grouped by model</p>
+              <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <div class="grid gap-2">
+                  <Label for="name">Role Name</Label>
+                  <Input
+                    id="name"
+                    v-model="form.name"
+                    type="text"
+                    placeholder="Enter role name"
+                    required
+                  />
+                  <InputError :message="form.errors.name" />
                 </div>
 
+                <div class="grid gap-2">
+                  <Label for="guard_name">Guard Name</Label>
+                  <Input
+                    id="guard_name"
+                    v-model="form.guard_name"
+                    type="text"
+                    placeholder="web"
+                    required
+                  />
+                  <InputError :message="form.errors.guard_name" />
+                </div>
+              </div>
+
+              <div class="grid gap-2">
+                <Label class="text-base font-semibold flex items-center gap-2">
+                  <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+                  </svg>
+                  Permissions
+                </Label>
+                <p class="text-sm text-muted-foreground">Select permissions for this role, grouped by model</p>
                 <div class="mt-2">
                   <Toggle
                     id="select-all-permissions"
@@ -149,53 +161,107 @@ function submit() {
                     label="Select All Permissions"
                   />
                 </div>
-                <div class="grid grid-cols-2 gap-4">
-                  <template v-for="(permissions, model) in props.permissions" :key="model">
-                    <Card class="border-l-2 border-l-primary/20 shadow-sm hover:shadow-md hover:border-l-primary/50 transition-all duration-200">
-                      <CardHeader class="pb-4">
-                        <CardTitle class="text-lg capitalize flex items-center gap-3">
-                          <div class="w-4 h-4 rounded-full bg-primary/20 flex items-center justify-center">
-                            <div class="w-2 h-2 rounded-full bg-primary"></div>
-                          </div>
-                          {{ model }} Permissions
-                          <span class="text-sm font-normal text-muted-foreground">({{ permissions.length }} permissions)</span>
-                        </CardTitle>
-                        <CardDescription>
-                          Manage {{ model }} access and ownership permissions
-                        </CardDescription>
-                      </CardHeader>
-                      <CardContent>
-                        <div class="grid grid-cols-2 gap-2">
-                          <template v-for="permission in permissions" :key="permission.id">
-                            <label :for="`permission-${permission.id}`" class="group flex items-center space-x-3 p-4 rounded-lg border border-border/50 hover:border-primary/30 hover:bg-primary/5 transition-all cursor-pointer">
-                              <Toggle
-                                :id="`permission-${permission.id}`"
-                                :model-value="form.permissions.includes(permission.id)"
-                                @update:model-value="(checked) => {
-                                    if (checked) {
-                                        form.permissions.push(permission.id)
-                                    } else {
-                                        form.permissions = form.permissions.filter(p => p !== permission.id)
-                                    }
-                                }"/>
-                              <div class="flex-1 min-w-0">
-                                <div class="flex items-center gap-2">
-                                  <span class="font-medium capitalize text-sm">{{ permission.action }}</span>
-                                  <span class="text-xs text-muted-foreground bg-muted px-2 py-1 rounded-full">{{ model }}</span>
-                                </div>
-                                <p class="text-xs text-muted-foreground mt-1">{{ permission.name }}</p>
-                              </div>
-                            </label>
-                          </template>
-                        </div>
-                      </CardContent>
-                    </Card>
-                  </template>
-                </div>
-
-                <InputError :message="form.errors.permissions" />
               </div>
-
+              <Tabs default-value="resource" class="w-full">
+                <TabsList class="grid w-full grid-cols-2">
+                  <TabsTrigger value="resource">
+                    Resource
+                  </TabsTrigger>
+                  <TabsTrigger value="management">
+                    Management
+                  </TabsTrigger>
+                </TabsList>
+                <TabsContent value="resource">
+                  <div class="grid grid-cols-2 gap-4">
+                    <template v-for="(permissions, model) in props.permissions.resource" :key="model">
+                      <Card class="border-l-2 border-l-primary/20 shadow-sm hover:shadow-md hover:border-l-primary/50 transition-all duration-200">
+                        <CardHeader class="pb-4">
+                          <CardTitle class="text-lg capitalize flex items-center gap-3">
+                            <div class="w-4 h-4 rounded-full bg-primary/20 flex items-center justify-center">
+                              <div class="w-2 h-2 rounded-full bg-primary"></div>
+                            </div>
+                            {{ model }} Permissions
+                            <span class="text-sm font-normal text-muted-foreground">({{ permissions.length }} permissions)</span>
+                          </CardTitle>
+                          <CardDescription>
+                            Manage {{ model }} access and ownership permissions
+                          </CardDescription>
+                        </CardHeader>
+                        <CardContent>
+                          <div class="grid grid-cols-2 gap-2">
+                            <template v-for="permission in permissions" :key="permission.id">
+                              <label :for="`permission-${permission.id}`" class="group flex items-center space-x-3 p-4 rounded-lg border border-border/50 hover:border-primary/30 hover:bg-primary/5 transition-all cursor-pointer">
+                                <Toggle
+                                  :id="`permission-${permission.id}`"
+                                  :model-value="form.permissions.includes(permission.id)"
+                                  @update:model-value="(checked) => {
+                                      if (checked) {
+                                          form.permissions.push(permission.id)
+                                      } else {
+                                          form.permissions = form.permissions.filter(p => p !== permission.id)
+                                      }
+                                  }"/>
+                                <div class="flex-1 min-w-0">
+                                  <div class="flex items-center gap-2">
+                                    <span class="font-medium capitalize text-sm">{{ permission.action }}</span>
+                                    <span class="text-xs text-muted-foreground bg-muted px-2 py-1 rounded-full">{{ model }}</span>
+                                  </div>
+                                  <p class="text-xs text-muted-foreground mt-1">{{ permission.name }}</p>
+                                </div>
+                              </label>
+                            </template>
+                          </div>
+                        </CardContent>
+                      </Card>
+                    </template>
+                  </div>
+                </TabsContent>
+                <TabsContent value="management">
+                  <div class="grid grid-cols-2 gap-4">
+                    <template v-for="(permissions, model) in props.permissions.management" :key="model">
+                      <Card class="border-l-2 border-l-primary/20 shadow-sm hover:shadow-md hover:border-l-primary/50 transition-all duration-200">
+                        <CardHeader class="pb-4">
+                          <CardTitle class="text-lg capitalize flex items-center gap-3">
+                            <div class="w-4 h-4 rounded-full bg-primary/20 flex items-center justify-center">
+                              <div class="w-2 h-2 rounded-full bg-primary"></div>
+                            </div>
+                            {{ model }} Permissions
+                            <span class="text-sm font-normal text-muted-foreground">({{ permissions.length }} permissions)</span>
+                          </CardTitle>
+                          <CardDescription>
+                            Manage {{ model }} access and ownership permissions
+                          </CardDescription>
+                        </CardHeader>
+                        <CardContent>
+                          <div class="grid grid-cols-2 gap-2">
+                            <template v-for="permission in permissions" :key="permission.id">
+                              <label :for="`permission-${permission.id}`" class="group flex items-center space-x-3 p-4 rounded-lg border border-border/50 hover:border-primary/30 hover:bg-primary/5 transition-all cursor-pointer">
+                                <Toggle
+                                  :id="`permission-${permission.id}`"
+                                  :model-value="form.permissions.includes(permission.id)"
+                                  @update:model-value="(checked) => {
+                                      if (checked) {
+                                          form.permissions.push(permission.id)
+                                      } else {
+                                          form.permissions = form.permissions.filter(p => p !== permission.id)
+                                      }
+                                  }"/>
+                                <div class="flex-1 min-w-0">
+                                  <div class="flex items-center gap-2">
+                                    <span class="font-medium capitalize text-sm">{{ permission.action }}</span>
+                                    <span class="text-xs text-muted-foreground bg-muted px-2 py-1 rounded-full">{{ model }}</span>
+                                  </div>
+                                  <p class="text-xs text-muted-foreground mt-1">{{ permission.name }}</p>
+                                </div>
+                              </label>
+                            </template>
+                          </div>
+                        </CardContent>
+                      </Card>
+                    </template>
+                  </div>
+                </TabsContent>
+              </Tabs>
               <div class="flex gap-4">
                 <Button type="submit" :disabled="form.processing" class="transition-all duration-200 hover:shadow-md">
                   Update Role
