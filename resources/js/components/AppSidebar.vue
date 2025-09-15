@@ -22,6 +22,7 @@ import {
   Settings,
   BarChart3,
   User,
+  List,
 } from 'lucide-vue-next'
 import AppLogo from './AppLogo.vue'
 
@@ -30,7 +31,6 @@ interface MenuItem {
   title: string
   href: string
   icon: string
-  children?: MenuItem[]
 }
 
 // Inertia page
@@ -46,6 +46,7 @@ const iconMap: Record<string, any> = {
   User,
   Folder,
   BookOpen,
+  List,
 }
 
 const menuItems = computed(() => {
@@ -55,7 +56,6 @@ const menuItems = computed(() => {
     title: item.title,
     href: item.href,
     icon: iconMap[item.icon] || LayoutGrid,
-    children: item.children ?? [],
   }))
 })
 
