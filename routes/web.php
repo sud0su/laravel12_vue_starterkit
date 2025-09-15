@@ -4,7 +4,6 @@ use Illuminate\Support\Facades\Route;
 use Inertia\Inertia;
 use App\Http\Controllers\RoleController;
 use App\Http\Controllers\UserController;
-use App\Http\Controllers\RoleMenuController;
 
 Route::get('/', function () {
     return Inertia::render('Welcome');
@@ -17,6 +16,7 @@ Route::get('dashboard', function () {
 Route::middleware(['auth', 'verified', 'resource.permission'])->group(function () {
     Route::resource('roles', RoleController::class);
     Route::resource('users', UserController::class);
+    // {{RAZINAL_RESOURCE_ROUTES}}
 });
 
 Route::get('/assign-admin-role', function () {
