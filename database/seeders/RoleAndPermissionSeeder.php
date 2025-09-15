@@ -21,7 +21,6 @@ class RoleAndPermissionSeeder extends Seeder
         $models = [
             'roles',
             'users',
-            'soals', // Tambahkan model baru di sini
         ];
 
         // Generate permissions untuk setiap model
